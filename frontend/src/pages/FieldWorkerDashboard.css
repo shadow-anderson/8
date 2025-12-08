@@ -358,6 +358,102 @@ section h3 {
   color: white;
 }
 
+.version-item {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.version-item h4 {
+  margin: 0 0 1rem 0;
+  color: #667eea;
+}
+
+.version-files {
+  margin-top: 0.5rem;
+}
+
+.version-files ul {
+  list-style: none;
+  padding: 0;
+}
+
+.file-item {
+  background: white;
+  border: 1px solid #e0e0e0;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border-radius: 4px;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.file-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.file-size {
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.file-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.file-link {
+  padding: 0.4rem 1rem;
+  background: #667eea;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  transition: background 0.3s;
+}
+
+.file-link:hover {
+  background: #5568d3;
+}
+
+.copy-url-btn {
+  padding: 0.4rem 1rem;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.3s;
+}
+
+.copy-url-btn:hover {
+  background: #45a049;
+}
+
+.file-url {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #f5f5f5;
+  border-radius: 4px;
+  word-break: break-all;
+}
+
+.file-url small {
+  color: #666;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+}
+
 .auto-score {
   background: #e3f2fd;
   padding: 1rem;
@@ -457,6 +553,46 @@ section h3 {
   border-radius: 4px;
   font-size: 0.75rem;
   margin-left: 0.5rem;
+}
+
+.evidence-url-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+}
+
+.evidence-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.evidence-link {
+  padding: 0.4rem 1rem;
+  background: #667eea;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  transition: background 0.3s;
+  display: inline-block;
+}
+
+.evidence-link:hover {
+  background: #5568d3;
+}
+
+.evidence-url {
+  padding: 0.5rem;
+  background: #f5f5f5;
+  border-radius: 4px;
+  word-break: break-all;
+}
+
+.evidence-url small {
+  color: #666;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
 }
 
 /* ============================================================================

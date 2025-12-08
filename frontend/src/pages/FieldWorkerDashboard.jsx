@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { uploadToCloudinary, uploadMultipleToCloudinary } from '../config/cloudinary.service';
 import './FieldWorkerDashboard.css';
 
 // ============================================================================
@@ -240,6 +241,7 @@ function ProductivityStrip() {
 // 2. DPR UPLOAD WORKSPACE
 // ============================================================================
 function DPRWorkspace({ isOnline }) {
+  const { user } = useAuth();
   const [files, setFiles] = useState([]);
   const [versions, setVersions] = useState([]);
   const [status, setStatus] = useState('Draft');
@@ -252,8 +254,7 @@ function DPRWorkspace({ isOnline }) {
   }, []);
 
   async function uploadDPR(fileList) {
-    // TODO: Replace with actual API call
-    console.log('Uploading DPR files:', fileList);
+    console.log('Uploading DPR files to Cloudinary:', fileList);
     
     if (!isOnline) {
       // Store in localStorage for offline mode
@@ -264,11 +265,63 @@ function DPRWorkspace({ isOnline }) {
       return;
     }
 
-    // Mock upload
-    const newVersion = { id: versions.length + 1, name: `V${versions.length + 1}`, date: new Date().toLocaleString() };
-    setVersions([...versions, newVersion]);
-    setStatus('Submitted');
-    setAutoScore({ timeliness: 85, quality: 90 });
+    try {
+      // Upload files to Cloudinary
+      setStatus('Uploading...');
+      const uploadResults = await uploadMultipleToCloudinary(
+        fileList,
+        'dpr',
+        {
+          tags: ['dpr', 'field-worker', user?.username],
+          context: {
+            alt: 'DPR Document',
+            uploadedBy: user?.username,
+            uploadDate: new Date().toISOString(),
+          },
+        }
+      );
+
+      // Check if all uploads were successful
+      const successfulUploads = uploadResults.filter(result => result.success);
+      const failedUploads = uploadResults.filter(result => !result.success);
+
+      if (failedUploads.length > 0) {
+        console.error('Some uploads failed:', failedUploads);
+        alert(`${failedUploads.length} file(s) failed to upload. Please try again.`);
+      }
+
+      if (successfulUploads.length > 0) {
+        // Create new version with Cloudinary URLs
+        const newVersion = {
+          id: versions.length + 1,
+          name: `V${versions.length + 1}`,
+          date: new Date().toLocaleString(),
+          files: successfulUploads.map(result => ({
+            name: result.originalFilename,
+            url: result.url,
+            publicId: result.publicId,
+            size: result.size,
+          })),
+        };
+        setVersions([...versions, newVersion]);
+        setStatus('Submitted');
+        setAutoScore({ timeliness: 85, quality: 90 });
+        
+        // Log URLs for easy access
+        console.log('✅ Upload successful! Public URLs:');
+        successfulUploads.forEach((result, idx) => {
+          console.log(`${idx + 1}. ${result.originalFilename}`);
+          console.log(`   URL: ${result.url}`);
+          console.log(`   Public ID: ${result.publicId}`);
+        });
+        
+        alert(`Successfully uploaded ${successfulUploads.length} file(s) to Cloudinary!\nCheck console for public URLs.`);
+      }
+    } catch (error) {
+      console.error('DPR upload error:', error);
+      alert('Upload failed. Please try again.');
+      setStatus('Draft');
+    }
   }
 
   async function fetchDPRStatus() {
@@ -344,13 +397,50 @@ function DPRWorkspace({ isOnline }) {
         {versions.length === 0 ? (
           <p>No versions yet</p>
         ) : (
-          <ul>
+          <div>
             {versions.map((v) => (
-              <li key={v.id}>
-                {v.name} - {v.date}
-              </li>
+              <div key={v.id} className="version-item">
+                <h4>{v.name} - {v.date}</h4>
+                {v.files && v.files.length > 0 && (
+                  <div className="version-files">
+                    <p><strong>Files ({v.files.length}):</strong></p>
+                    <ul>
+                      {v.files.map((file, idx) => (
+                        <li key={idx} className="file-item">
+                          <div className="file-info">
+                            <span className="file-name">📄 {file.name}</span>
+                            <span className="file-size">({(file.size / 1024).toFixed(2)} KB)</span>
+                          </div>
+                          <div className="file-actions">
+                            <a 
+                              href={file.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="file-link"
+                            >
+                              🔗 View
+                            </a>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(file.url);
+                                alert('URL copied to clipboard!');
+                              }}
+                              className="copy-url-btn"
+                            >
+                              📋 Copy URL
+                            </button>
+                          </div>
+                          <div className="file-url">
+                            <small>{file.url}</small>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
 
@@ -377,6 +467,7 @@ function DPRWorkspace({ isOnline }) {
 // 3. EVIDENCE CAPTURE PORTAL
 // ============================================================================
 function EvidencePortal({ isOnline }) {
+  const { user } = useAuth();
   const [evidence, setEvidence] = useState([]);
   const [viewMode, setViewMode] = useState('gallery'); // 'gallery' or 'timeline'
 
@@ -385,8 +476,7 @@ function EvidencePortal({ isOnline }) {
   }, []);
 
   async function uploadEvidence(file, metadata) {
-    // TODO: Replace with actual API call
-    console.log('Uploading evidence:', file, metadata);
+    console.log('Uploading evidence to Cloudinary:', file, metadata);
 
     if (!isOnline) {
       const drafts = JSON.parse(localStorage.getItem('offlineDrafts') || '[]');
@@ -396,14 +486,49 @@ function EvidencePortal({ isOnline }) {
       return;
     }
 
-    // Mock upload success
-    const newEvidence = {
-      id: evidence.length + 1,
-      name: file.name,
-      ...metadata,
-      aiFlag: Math.random() > 0.8, // Random AI flag
-    };
-    setEvidence([...evidence, newEvidence]);
+    try {
+      // Upload to Cloudinary
+      const uploadResult = await uploadToCloudinary(
+        file,
+        'evidence',
+        {
+          tags: ['evidence', 'field-worker', metadata.taskId],
+          context: {
+            alt: 'Field Evidence',
+            uploadedBy: user?.username,
+            gps: metadata.gps,
+            device: metadata.device,
+            taskId: metadata.taskId,
+          },
+        }
+      );
+
+      if (uploadResult.success) {
+        // Add evidence with Cloudinary URL
+        const newEvidence = {
+          id: evidence.length + 1,
+          name: file.name,
+          url: uploadResult.url,
+          publicId: uploadResult.publicId,
+          ...metadata,
+          aiFlag: Math.random() > 0.8, // Random AI flag (implement actual AI check)
+        };
+        setEvidence([...evidence, newEvidence]);
+        
+        // Log URL for easy access
+        console.log('✅ Evidence uploaded successfully!');
+        console.log(`   File: ${file.name}`);
+        console.log(`   Public URL: ${uploadResult.url}`);
+        console.log(`   Public ID: ${uploadResult.publicId}`);
+        
+        alert('Evidence uploaded successfully to Cloudinary!\nCheck console for public URL.');
+      } else {
+        throw new Error(uploadResult.error);
+      }
+    } catch (error) {
+      console.error('Evidence upload error:', error);
+      alert(`Upload failed: ${error.message}`);
+    }
   }
 
   async function fetchEvidence() {
@@ -500,6 +625,32 @@ function EvidencePortal({ isOnline }) {
               <p>GPS: {item.gps}</p>
               <p>Device: {item.device}</p>
               <p>Linked to: {item.taskId}</p>
+              {item.url && (
+                <div className="evidence-url-section">
+                  <div className="evidence-actions">
+                    <a 
+                      href={item.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="evidence-link"
+                    >
+                      🔗 View File
+                    </a>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(item.url);
+                        alert('URL copied to clipboard!');
+                      }}
+                      className="copy-url-btn"
+                    >
+                      📋 Copy URL
+                    </button>
+                  </div>
+                  <div className="evidence-url">
+                    <small>{item.url}</small>
+                  </div>
+                </div>
+              )}
             </div>
           ))
         )}
