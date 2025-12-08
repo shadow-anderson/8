@@ -1,5 +1,5 @@
-const Evidence = require('../models/Evidence');
-const { AppError } = require('../middleware/errorHandler');
+import Evidence from '../models/Evidence.js';
+import User from '../models/User.js';
 
 /**
  * Evidence Controller
@@ -9,32 +9,37 @@ const { AppError } = require('../middleware/errorHandler');
 /**
  * Upload new evidence
  * POST /api/evidence
- * Body: { title, description, fileUrl, relatedTaskId }
- * req.body = {
- *   title: string (required),
- *   description: string (optional),
- *   fileUrl: string (required),
- *   relatedTaskId: string (optional)
- * }
  */
-exports.uploadEvidence = async (req, res, next) => {
+export const uploadEvidence = async (req, res, next) => {
   try {
-    const { title, description, fileUrl, projectId } = req.body;
+    const { 
+      uploaded_by, 
+      project_id, 
+      activity_id, 
+      file_url, 
+      mime, 
+      size,
+      gps 
+    } = req.body;
 
     // Validate required fields
-    if (!title || !fileUrl) {
-      return next(new AppError('Missing required fields: title and fileUrl', 400));
+    if (!file_url) {
+      return res.status(400).json({
+        error: 'Missing required field',
+        required: ['file_url']
+      });
     }
 
     // Create new evidence
-    const newEvidence = new Evidence({
-      title,
-      description,
-      fileUrl,
-      projectId: projectId || null
+    const newEvidence = await Evidence.create({
+      uploaded_by: uploaded_by || req.userId,
+      project_id: project_id || null,
+      activity_id: activity_id || null,
+      file_url,
+      mime: mime || null,
+      size: size || null,
+      gps: gps || null
     });
-
-    await newEvidence.save();
 
     res.status(201).json({
       message: 'Evidence uploaded successfully',
@@ -43,21 +48,119 @@ exports.uploadEvidence = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}
+};
+
+/**
+ * Get all evidence with filters
+ * GET /api/evidence
+ */
+export const getAllEvidence = async (req, res, next) => {
+  try {
+    const { uploaded_by, project_id, activity_id } = req.query;
+
+    const filter = {};
+    if (uploaded_by) filter.uploaded_by = uploaded_by;
+    if (project_id) filter.project_id = project_id;
+    if (activity_id) filter.activity_id = activity_id;
+
+    const evidences = await Evidence.find(filter)
+      .populate('uploaded_by', 'name email emp_code')
+      .populate('project_id', 'name')
+      .sort({ uploaded_at: -1 });
+
+    res.json({
+      count: evidences.length,
+      evidences
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get evidence by ID
+ * GET /api/evidence/:id
+ */
+export const getEvidenceById = async (req, res, next) => {
+  try {
+    const evidence = await Evidence.findById(req.params.id)
+      .populate('uploaded_by', 'name email emp_code')
+      .populate('project_id', 'name')
+      .populate('activity_id');
+
+    if (!evidence) {
+      return res.status(404).json({
+        error: 'Evidence not found'
+      });
+    }
+
+    res.json({ evidence });
+  } catch (error) {
+    next(error);
+  }
+};
 
 /**
  * Get evidence by project ID
  * GET /api/evidence/project/:projectId
  */
-exports.getEvidenceByProject = async (req, res, next) => {
+export const getEvidenceByProject = async (req, res, next) => {
   try {
     const { projectId } = req.params;
-    const evidences = await Evidence.find({ projectId });
+    
+    const evidences = await Evidence.find({ project_id: projectId })
+      .populate('uploaded_by', 'name email emp_code')
+      .sort({ uploaded_at: -1 });
 
-    res.status(200).json({
+    res.json({
+      count: evidences.length,
       evidences
     });
   } catch (error) {
     next(error);
-  }     
-}
+  }
+};
+
+/**
+ * Get evidence by user
+ * GET /api/evidence/user/:userId
+ */
+export const getEvidenceByUser = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    
+    const evidences = await Evidence.find({ uploaded_by: userId })
+      .populate('project_id', 'name')
+      .sort({ uploaded_at: -1 });
+
+    res.json({
+      count: evidences.length,
+      evidences
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Delete evidence
+ * DELETE /api/evidence/:id
+ */
+export const deleteEvidence = async (req, res, next) => {
+  try {
+    const evidence = await Evidence.findByIdAndDelete(req.params.id);
+
+    if (!evidence) {
+      return res.status(404).json({
+        error: 'Evidence not found'
+      });
+    }
+
+    res.json({
+      message: 'Evidence deleted successfully',
+      evidence
+    });
+  } catch (error) {
+    next(error);
+  }
+};

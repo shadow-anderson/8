@@ -17,13 +17,7 @@ export const createProject = async (req, res, next) => {
       budget_planned
     } = req.body;
 
-    // Validate required fields
-    if (!name || !project_type) {
-      return res.status(400).json({
-        error: 'Missing required fields',
-        required: ['name', 'project_type']
-      });
-    }
+  
 
     // Validate project_type
     if (!['single', 'milestone'].includes(project_type)) {
