@@ -1,5 +1,6 @@
 import Evidence from '../models/Evidence.js';
 import User from '../models/User.js';
+import Project from '../models/Project.js';
 
 /**
  * Evidence Controller
@@ -30,11 +31,21 @@ export const uploadEvidence = async (req, res, next) => {
       });
     }
 
+    // Get manager ID from project if project_id is provided
+    let managerId = null;
+    if (project_id) {
+      const project = await Project.findById(project_id);
+      if (project && project.givenBy) {
+        managerId = project.givenBy;
+      }
+    }
+
     // Create new evidence
     const newEvidence = await Evidence.create({
       uploaded_by: uploaded_by || req.userId,
       project_id: project_id || null,
       activity_id: activity_id || null,
+      managerId: managerId,
       file_url,
       mime: mime || null,
       size: size || null,
@@ -135,6 +146,30 @@ export const getEvidenceByUser = async (req, res, next) => {
 
     res.json({
       count: evidences.length,
+      evidences
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get evidence by manager ID
+ * GET /api/evidence/manager/:managerId
+ */
+export const getEvidenceByManager = async (req, res, next) => {
+  try {
+    const { managerId } = req.params;
+    
+    const evidences = await Evidence.find({ managerId: managerId })
+      .populate('uploaded_by', 'name email emp_code')
+      .populate('project_id', 'name description')
+      .populate('managerId', 'name email emp_code')
+      .sort({ uploaded_at: -1 });
+
+    res.json({
+      count: evidences.length,
+      managerId: managerId,
       evidences
     });
   } catch (error) {

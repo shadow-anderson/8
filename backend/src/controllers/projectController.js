@@ -14,7 +14,8 @@ export const createProject = async (req, res, next) => {
       project_type,
       planned_end,
       milestones,
-      budget_planned
+      budget_planned,
+      givenBy
     } = req.body;
 
   
@@ -38,7 +39,8 @@ export const createProject = async (req, res, next) => {
       milestones: milestones || [],
       budget_planned,
       budget_used: 0,
-      progress: 0
+      progress: 0,
+      givenBy
     });
 
     res.status(201).json({

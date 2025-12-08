@@ -6,6 +6,8 @@ const EvidenceSchema = new mongoose.Schema({
   project_id: { type: String, ref: "Project" },
   activity_id: { type: String, ref: "Activity" },
 
+  managerId: { type: String, ref: "User" },
+
   file_url: { type: String, required: true },
   mime: String,
   size: Number,

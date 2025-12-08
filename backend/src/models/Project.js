@@ -8,6 +8,8 @@ const ProjectSchema = new mongoose.Schema({
   owner_id: { type: String, ref: "User" },
   members: [{ type: String, ref: "User" }],
 
+  givenBy: {type: String, ref: "User"},
+
   division: String,
   project_type: {
     type: String,

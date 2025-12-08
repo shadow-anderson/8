@@ -5,6 +5,7 @@ import {
   getEvidenceById,
   getEvidenceByProject,
   getEvidenceByUser,
+  getEvidenceByManager,
   deleteEvidence
 } from '../controllers/evidenceController.js';
 import { authenticate, authorize } from '../middleware/auth.js';
@@ -50,6 +51,13 @@ router.get('/project/:projectId', getEvidenceByProject);
  * @access  Authenticated users
  */
 router.get('/user/:userId', getEvidenceByUser);
+
+/**
+ * @route   GET /api/evidence/manager/:managerId
+ * @desc    Get all evidence by manager ID
+ * @access  Authenticated users
+ */
+router.get('/manager/:managerId', getEvidenceByManager);
 
 /**
  * @route   DELETE /api/evidence/:id
