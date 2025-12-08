@@ -513,6 +513,11 @@ section h3 {
   border-color: #667eea;
 }
 
+.view-toggle button.not-active {
+  color: #666;
+  border-color: #666;
+}
+
 .evidence-list {
   display: grid;
   gap: 1rem;
@@ -731,6 +736,19 @@ section h3 {
   background: #f5f5f5;
   border-radius: 4px;
   border-left: 4px solid #667eea;
+  color: #666;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: #667eea;
+  opacity: 0.2; /* soft, non-intrusive */
+  pointer-events: none;
 }
 
 .kpi-chart {
@@ -744,6 +762,7 @@ section h3 {
   background: #e3f2fd;
   border-radius: 4px;
   margin: 1rem 0;
+  color:   #666;
 }
 
 .kpi-insights {
@@ -751,6 +770,10 @@ section h3 {
   padding: 1rem;
   border-radius: 4px;
   border-left: 4px solid #FF9800;
+}
+
+.kpi-insights-para {
+  color: #666;
 }
 
 /* ============================================================================
