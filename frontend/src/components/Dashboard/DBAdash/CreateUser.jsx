@@ -49,7 +49,7 @@ export default function CreateUser() {
         </div>
         
         <button type="submit" className="btn-submit">
-          Create Admin
+          Create User
         </button>
       </form>
     </div>
