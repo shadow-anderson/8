@@ -514,6 +514,8 @@ function EvidencePortal({ isOnline }) {
           aiFlag: Math.random() > 0.8, // Random AI flag (implement actual AI check)
         };
         setEvidence([...evidence, newEvidence]);
+
+        
         
         // Log URL for easy access
         console.log('✅ Evidence uploaded successfully!');
