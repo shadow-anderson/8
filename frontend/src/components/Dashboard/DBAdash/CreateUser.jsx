@@ -6,6 +6,8 @@ export default function CreateUser() {
     email: "",
     phone: "",
     emp_id: "",
+    emp_role: "",
+    emp_division: "",
   })
 
   const handleChange = (e) => {
@@ -20,7 +22,7 @@ export default function CreateUser() {
     e.preventDefault()
     console.log("New Admin:", formData)
     alert("User created successfully!")
-    setFormData({ name: "", email: "", phone: "", emp_id: "" })
+    setFormData({ name: "", email: "", phone: "", emp_id: "", emp_role: "", emp_division: "" })
   }
 
   return (
@@ -37,15 +39,29 @@ export default function CreateUser() {
         </div>
         <div className="form-group">
           <label htmlFor="phone">Phone:</label>
-          <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} />
+          <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
         </div>
         <div className="form-group">
           <label htmlFor="emp_id">Employee Id:</label>
-          <input id="emp_id" name="emp_id" value={formData.emp_id} onChange={handleChange} />
+          <input id="emp_id" name="emp_id" value={formData.emp_id} onChange={handleChange} required />
         </div>
-        <div className="form-group">
-          {/* <input type="checkbox" id="role" name="role" value="Role"></input>
-          <label htmlFor="role">Role:</label> */}
+        <div className="form-dropdown-group">
+          <div className="form-group-dropdown">
+            <label htmlFor="emp_role">Role:</label>
+            <select name="emp_role" id="emp_role" value={formData.emp_role} onChange={handleChange}>
+              <option value="" selected required>Select</option>
+              <option value="individual">Individual</option>
+              <option value="manager">Manager</option>
+            </select>
+          </div>
+          <div className="form-group-dropdown">
+            <label htmlFor="emp_division">Division:</label>
+            <select name="emp_division" id="emp_division" value={formData.emp_division} onChange={handleChange}>
+              <option value="" selected required>Select</option>
+              <option value="hq" selected>HQ</option>
+              <option value="field" selected>Field</option>
+            </select>
+          </div>
         </div>
         
         <button type="submit" className="btn-submit">

@@ -173,6 +173,46 @@ body {
   box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
 }
 
+.form-dropdown-group {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  gap: 20px;
+  font-size: 14px;
+}
+
+.form-group-dropdown {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex: 1;
+}
+
+.form-group-dropdown select {
+  flex: 1;
+  padding: 10px 14px;
+  background-color: #ffffff;
+  border: 2px solid #e8dcd6;
+  border-radius: 6px;
+  color: #2d2420;
+  font-family: inherit;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.form-group-dropdown select:focus {
+  outline: none;
+  border-color: #7c3aed;
+  background-color: #faf8f6;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+}
+
+.form-group-dropdown label {
+  align-self: center;
+  font-weight: 500;
+  color: #2d2420;
+}
+
 /* Updated submit button to purple */
 .btn-submit {
   padding: 12px 24px;
