@@ -1,22 +1,29 @@
-// KPI-related API endpoints
-const express = require('express');
+import express from 'express';
+import { authenticate, authorize } from '../middleware/auth.js';
+
 const router = express.Router();
-// const kpiController = require('../controllers/kpiController');
-// const { authenticate } = require('../middleware/auth');
 
-// GET /api/kpis - Get all KPIs
-// router.get('/', authenticate, kpiController.getAllKpis);
+// KPI routes will be added here
+// Example structure:
 
-// GET /api/kpis/:id - Get KPI by ID
-// router.get('/:id', authenticate, kpiController.getKpiById);
+// GET /api/kpi/:projectId - Get KPIs for a project
+router.get('/:projectId', authenticate, async (req, res) => {
+  try {
+    // Implementation will be added later
+    res.json({ message: 'Get KPIs endpoint - To be implemented' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-// POST /api/kpis - Create new KPI
-// router.post('/', authenticate, kpiController.createKpi);
+// POST /api/kpi - Create/Update KPIs
+router.post('/', authenticate, async (req, res) => {
+  try {
+    // Implementation will be added later
+    res.json({ message: 'Create/Update KPIs endpoint - To be implemented' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-// PUT /api/kpis/:id - Update KPI
-// router.put('/:id', authenticate, kpiController.updateKpi);
-
-// GET /api/kpis/:id/scores - Get scores for a KPI
-// router.get('/:id/scores', authenticate, kpiController.getKpiScores);
-
-module.exports = router;
+export default router;
