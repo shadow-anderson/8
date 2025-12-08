@@ -9,6 +9,7 @@ export default function HQSidebar({ activeSection, setActiveSection }) {
     { id: "notifications", label: "Notifications", icon: "🔔" },
     { id: "kpi", label: "KPI Report", icon: "📈" },
     { id: "growth", label: "My Growth", icon: "⭐" },
+    { id: "otherKPI", label: "Compare KPI", icon: "📈" },
   ]
 
   return (
