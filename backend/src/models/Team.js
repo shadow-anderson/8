@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const TeamSchema = new mongoose.Schema({
 
   name: { type: String, required: true },
-  division: { type: String, required: true },  // e.g., "Admin", "Design", "Survey"
+  division: { type: String, required: true },  // e.g., "HQ", "Feild"
   
   leader_email: { type: String, ref: "User" },
   members: [{ type: String, ref: "User" }],

@@ -75,7 +75,7 @@ export const createTeam = async (req, res, next) => {
     // Create new team (store emails in members array)
     const newTeam = new Team({
       name: teamName,
-      division: division || teamLeader.division || 'General',
+      division: division,
       leader_email: teamLeaderEmail,
       members: teamMemberEmails,
       description: description || '',
