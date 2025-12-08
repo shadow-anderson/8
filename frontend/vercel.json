@@ -1,9 +1,5 @@
 {
-  "builds": [
-    { "src": "frontend/package.json", "use": "@vercel/static-build", "config": {} }
-  ],
-  "routes": [
-    { "source": "/(.*)", "destination": "/frontend/$1" }
-  ],
-  "outputDirectory": "frontend"
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
+  ]
 }
