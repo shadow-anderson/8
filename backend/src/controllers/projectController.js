@@ -101,6 +101,34 @@ export const getProjectById = async (req, res, next) => {
 };
 
 /**
+ * Get all projects by user ID (owned or member)
+ * GET /api/projects/user/:userId
+ */
+export const getProjectsByUserId = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    // Find projects where user is owner or member (using _id)
+    const projects = await Project.find({
+      $or: [
+        { owner_id: userId },
+        { members: userId }
+      ]
+    })
+      .populate('owner_id', 'name email emp_code')
+      .populate('members', 'name email emp_code')
+      .sort({ created_at: -1 });
+
+    res.json({
+      count: projects.length,
+      projects
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Update project
  * PUT /api/projects/:id
  */

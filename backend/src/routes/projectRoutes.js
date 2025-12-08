@@ -3,6 +3,7 @@ import {
   createProject,
   getAllProjects,
   getProjectById,
+  getProjectsByUserId,
   updateProject,
   deleteProject,
   updateMilestone,
@@ -31,6 +32,13 @@ router.post('/', createProject);
  * @query   owner_id, division, project_type, member_id
  */
 router.get('/', getAllProjects);
+
+/**
+ * @route   GET /api/projects/user/:userId
+ * @desc    Get all projects by user ID (owned or member)
+ * @access  Authenticated users
+ */
+router.get('/user/:userId', getProjectsByUserId);
 
 /**
  * @route   GET /api/projects/:id
