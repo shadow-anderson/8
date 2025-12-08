@@ -309,7 +309,7 @@ export const deleteTeam = async (req, res, next) => {
 };
 
 /**
- * Create a new task/activity
+ * Create a new activity
  * POST /api/manager/tasks
  * Body: { userId, projectId, type, action, fileId, tatDays, progress, meta }
  * 
@@ -353,7 +353,7 @@ export const createTask = async (req, res, next) => {
         validTypes 
       });
     }
-
+   
     // Validate action
     const validActions = ['received', 'closed', 'update', 'progress'];
     if (!validActions.includes(action)) {
@@ -371,7 +371,7 @@ export const createTask = async (req, res, next) => {
       });
     }
 
-    // Create new activity/task
+    // Create new activity
     const newActivity = new Activities({
       user_id: userId,
       project_id: projectId || null,
@@ -387,12 +387,12 @@ export const createTask = async (req, res, next) => {
     await newActivity.save();
 
     res.status(201).json({
-      message: 'Task created successfully',
-      task: newActivity
+      message: 'Activity created successfully',
+      activity: newActivity
     });
 
   } catch (error) {
-    console.error('Error creating task:', error);
+    console.error('Error creating activity:', error);
     next(error);
   }
 };

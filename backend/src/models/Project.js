@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const ProjectSchema = new mongoose.Schema({
 
   name: { type: String, required: true },
+  description: { type: String },
 
   owner_id: { type: String, ref: "User" },
   members: [{ type: String, ref: "User" }],
@@ -17,6 +18,12 @@ const ProjectSchema = new mongoose.Schema({
   // SINGLE-TIME PROJECT FIELDS
   planned_end: Date,
   progress: { type: Number, default: 0 }, // 0–100 %
+
+  status: {
+        type: String,
+        enum: ["not_started", "in_progress", "completed", "delayed"],
+        default: "not_started"
+  },
 
   // MILESTONE-BASED PROJECT FIELDS
   milestones: [

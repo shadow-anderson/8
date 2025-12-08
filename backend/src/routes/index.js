@@ -4,6 +4,7 @@ import adminRoutes from './adminRoutes.js';
 import managerRoutes from './managerRoutes.js';
 import userRoutes from './userRoutes.js';
 import kpiRoutes from './kpiRoutes.js';
+import projectRoutes from './projectRoutes.js';
 
 const router = express.Router();
 
@@ -12,6 +13,7 @@ router.use('/admin', adminRoutes);
 router.use('/manager', managerRoutes);
 router.use('/users', userRoutes);
 router.use('/kpis', kpiRoutes);
+router.use('/projects', projectRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {
