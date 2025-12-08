@@ -23,7 +23,7 @@ body {
 .sidebar {
   width: 280px;
   height: 100vh;
-  background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
+  background: linear-gradient(135deg, #6d28d9 0%, #c4b5fd 100%);
   border-right: 1px solid #a78bfa;
   padding: 20px 0;
   overflow-y: auto;
@@ -39,7 +39,7 @@ body {
 /* Updated header text color to white for purple background */
 .sidebar-header h2 {
   color: #fffff2;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   text-align: center;
 }
@@ -66,6 +66,7 @@ body {
   transition: all 0.3s ease;
   text-align: left;
   font-family: inherit;
+  font-size: 18px;
 }
 
 .nav-item:hover {
@@ -135,7 +136,7 @@ body {
 .admin-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 8px;
   max-width: 600px;
 }
 
@@ -149,7 +150,7 @@ body {
 .form-group label {
   color: #2d2420;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 /* Updated form input colors for cream and purple theme */
@@ -183,7 +184,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 14px;
+  font-size: 16px;
   margin-top: 10px;
 }
 
@@ -286,6 +287,7 @@ body {
 .member-card.lead {
   border-left: 3px solid #7c3aed;
   background-color: #f3e8ff;
+  font-size: 18px;
 }
 
 .member-info {
@@ -304,7 +306,7 @@ body {
 
 .member-detail {
   color: #6b5d54;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.4;
 }
 
@@ -316,11 +318,13 @@ body {
   width: 300px;
   border: none;
   background-color: #f3e8ff;
+  font-size: 17px;
 }
 .member-info input{
   padding: 3px;
   width: 300px;
   border: none;
+  font-size: 15px
 }
 /* Individual Data Styles */
 .search-box {
@@ -381,12 +385,14 @@ body {
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid #e8dcd6;
+  font-size: 15px;
 }
-
+.employee-header input{
+  font-size: 15px;
+}
 /* Updated employee header color to purple */
 .employee-header h3 {
   color: #7c3aed;
-  font-size: 16px;
   font-weight: 600;
 }
 
@@ -404,15 +410,19 @@ body {
   flex-direction: column;
   gap: 8px;
 }
+.employee-details input{
+  font-size: 15px;
+}
 
 .employee-details p {
   color: #6b5d54;
-  font-size: 14px;
+  /* font-size: 17px; */
   line-height: 1.5;
 }
 
 .employee-details strong {
   color: #7c3aed;
+  font-size: 17px;
 }
 
 /* Scrollbar Styling */
