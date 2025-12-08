@@ -11,5 +11,5 @@ export const genAI = new GoogleGenerativeAI(apiKey);
 
 // For models like Gemini 1.5 Flash / Pro
 export const geminiModel = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+  model: import.meta.env.VITE_GOOGLE_AI_MODEL || "gemini-1.5-pro",
 });

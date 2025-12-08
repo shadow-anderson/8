@@ -10,7 +10,9 @@ import HQWorkerDashboard from './pages/HQWorkerDashboard';
 import DbaDash from './components/Dashboard/DBAdash/DbaDash';
 import './App.css';
 
-import ChatBot from './components/AskPrabhav';
+import AskPrabhav from './components/AskPrabhav';
+// import GeminiEnvCheck from './components/GeminiEnvCheck';
+// import GeminiTest from './components/GeminiTest';
 
 function App() {
   return (
@@ -63,7 +65,9 @@ function App() {
       </Router>
     </AuthProvider>
 
-    <ChatBot />
+    {/* <GeminiTest /> */}
+
+    <AskPrabhav />
     </>
   );
 }

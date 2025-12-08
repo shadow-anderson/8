@@ -1,31 +1,32 @@
 import { useState } from "react";
 
-export default function ChatBot() {
+import { geminiModel } from "../lib/gemini";
+
+export default function AskPrabhav() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!input.trim()) return;
 
+    // Add user's message
     const userMsg = { sender: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
+    setInput(""); // clear input while waiting
 
-    // SIMPLE WEBSITE-SCOPED BOT LOGIC
-    let reply = "I can answer site-related questions only.";
+    try {
+      // Call Gemini
+      const result = await geminiModel.generateContent([input]);
+      const text = await result.response.text?.() || JSON.stringify(result.response);
 
-    if (input.toLowerCase().includes("contact")) {
-      reply = "You can reach support at support@example.com";
-    } else if (input.toLowerCase().includes("about")) {
-      reply = "This website provides XYZ services.";
-    } else if (input.toLowerCase().includes("help")) {
-      reply = "Sure! What do you need help with?";
+      const botMsg = { sender: "bot", text };
+      setMessages((prev) => [...prev, botMsg]);
+    } catch (err) {
+      const botMsg = { sender: "bot", text: "Error: " + (err?.message || String(err)) };
+      setMessages((prev) => [...prev, botMsg]);
+      console.error("Gemini error:", err);
     }
-
-    const botMsg = { sender: "bot", text: reply };
-    setMessages((prev) => [...prev, botMsg]);
-
-    setInput("");
   };
 
   return (
@@ -80,7 +81,7 @@ export default function ChatBot() {
               justifyContent: "space-between",
             }}
           >
-            <span>Chatbot</span>
+            <span>AskPrabhav</span>
             <button
               onClick={() => setOpen(false)}
               style={{ background: "transparent", border: "none", color: "white" }}
@@ -151,3 +152,26 @@ export default function ChatBot() {
     </div>
   );
 }
+
+const sendMessage = async () => {
+  if (!input.trim()) return;
+
+  // Add user's message
+  const userMsg = { sender: "user", text: input };
+  setMessages((prev) => [...prev, userMsg]);
+
+  setInput(""); // clear input while waiting for response
+
+  try {
+    // Call Gemini
+    const result = await genAIModel.generateContent([input]);
+    const text = await result.response.text?.() || JSON.stringify(result.response);
+
+    const botMsg = { sender: "bot", text };
+    setMessages((prev) => [...prev, botMsg]);
+  } catch (err) {
+    const botMsg = { sender: "bot", text: "Error: " + (err?.message || String(err)) };
+    setMessages((prev) => [...prev, botMsg]);
+    console.error("Gemini error:", err);
+  }
+};
