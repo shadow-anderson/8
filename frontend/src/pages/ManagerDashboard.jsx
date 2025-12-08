@@ -128,7 +128,7 @@ const ManagerDashboard = () => {
 
         {/* DPR Section */}
         <section className="dashboard-section">
-          <h2>📋 Daily Progress Reports</h2>
+          <h2>📋 Detailed Project Report</h2>
           <div className="section-content">
             <div className="dpr-grid">
               <div className="dpr-card">
