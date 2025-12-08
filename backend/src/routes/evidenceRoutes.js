@@ -32,13 +32,6 @@ router.post('/', uploadEvidence);
 router.get('/', getAllEvidence);
 
 /**
- * @route   GET /api/evidence/:id
- * @desc    Get evidence by ID
- * @access  Authenticated users
- */
-router.get('/:id', getEvidenceById);
-
-/**
  * @route   GET /api/evidence/project/:projectId
  * @desc    Get all evidence for a project
  * @access  Authenticated users
@@ -58,6 +51,13 @@ router.get('/user/:userId', getEvidenceByUser);
  * @access  Authenticated users
  */
 router.get('/manager/:managerId', getEvidenceByManager);
+
+/**
+ * @route   GET /api/evidence/:id
+ * @desc    Get evidence by ID
+ * @access  Authenticated users
+ */
+router.get('/:id', getEvidenceById);
 
 /**
  * @route   DELETE /api/evidence/:id
