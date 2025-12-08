@@ -1,0 +1,1104 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import './FieldWorkerDashboard.css';
+
+// ============================================================================
+// MAIN COMPONENT: Field Worker Dashboard
+// ============================================================================
+export default function FieldWorkerDashboard() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      syncOfflineData();
+    };
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  // Scroll to section smoothly
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setSidebarOpen(false); // Close mobile menu after clicking
+    }
+  };
+
+  // Navigation items
+  const navItems = [
+    { id: 'productivity-strip', label: '📊 Productivity Strip', icon: '📊' },
+    { id: 'dpr-workspace', label: '📋 DPR Workspace', icon: '📋' },
+    { id: 'evidence-portal', label: '📸 Evidence Portal', icon: '📸' },
+    { id: 'task-board', label: '📊 Task Board', icon: '📊' },
+    { id: 'kpi-meter', label: '📈 KPI Meter', icon: '📈' },
+    { id: 'project-timeline', label: '🗓️ Project Timeline', icon: '🗓️' },
+    { id: 'comm-hub', label: '💬 Communication Hub', icon: '💬' },
+    { id: 'notifications', label: '🔔 Notifications', icon: '🔔' },
+    { id: 'ask-prabhav', label: '🤖 AI Assistant', icon: '🤖' },
+    { id: 'compliance-validator', label: '✅ Compliance', icon: '✅' },
+    { id: 'worker-analytics', label: '📊 Analytics', icon: '📊' },
+    { id: 'accountability-log', label: '📜 Accountability', icon: '📜' },
+  ];
+
+  // Offline data sync function
+  async function syncOfflineData() {
+    const drafts = JSON.parse(localStorage.getItem('offlineDrafts') || '[]');
+    console.log('Syncing offline data:', drafts);
+    // TODO: Send drafts to backend
+    // After successful sync, clear localStorage
+    // localStorage.removeItem('offlineDrafts');
+  }
+
+  return (
+    <div className="field-worker-dashboard">
+      {/* Header */}
+      <header className="dashboard-header">
+        <div className="header-content">
+          <button className="hamburger-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
+            ☰
+          </button>
+          <h1>Field Worker Dashboard</h1>
+          <div className="header-actions">
+            <span className="user-name">Welcome, {user?.username}</span>
+            <button onClick={handleLogout} className="logout-btn">
+              Logout
+            </button>
+          </div>
+        </div>
+        {!isOnline && (
+          <div className="offline-banner">
+            ⚠️ You are offline — data will sync automatically when connection returns
+          </div>
+        )}
+      </header>
+
+      <div className="dashboard-layout">
+        {/* Sidebar Navigation */}
+        <aside className={`sidebar-nav ${sidebarOpen ? 'open' : ''}`}>
+          <div className="sidebar-header">
+            <h3>Navigation</h3>
+            <button className="close-btn" onClick={() => setSidebarOpen(false)}>×</button>
+          </div>
+          <nav className="nav-menu">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                className="nav-item"
+                onClick={() => scrollToSection(item.id)}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-label">{item.label}</span>
+              </button>
+            ))}
+          </nav>
+        </aside>
+
+        {/* Main Content */}
+        <main className="dashboard-content">
+          {/* 1. At-a-Glance Productivity Strip */}
+          <div id="productivity-strip">
+            <ProductivityStrip />
+          </div>
+
+          {/* 2. DPR Upload Workspace */}
+          <div id="dpr-workspace">
+            <DPRWorkspace isOnline={isOnline} />
+          </div>
+
+          {/* 3. Evidence Capture Portal */}
+          <div id="evidence-portal">
+            <EvidencePortal isOnline={isOnline} />
+          </div>
+
+          {/* 4. Task Board */}
+          <div id="task-board">
+            <TaskBoard />
+          </div>
+
+          {/* 5. Personal KPI Meter */}
+          <div id="kpi-meter">
+            <KPIMeter />
+          </div>
+
+          {/* 6. Project Timeline + Gantt */}
+          <div id="project-timeline">
+            <ProjectTimeline />
+          </div>
+
+          {/* 7. Communication & Clarification Hub */}
+          <div id="comm-hub">
+            <CommHub />
+          </div>
+
+          {/* 8. Notifications Center */}
+          <div id="notifications">
+            <Notifications />
+          </div>
+
+          {/* 9. AI Assistant */}
+          <div id="ask-prabhav">
+            <AskPrabhav />
+          </div>
+
+          {/* 10. Compliance Validator */}
+          <div id="compliance-validator">
+            <ComplianceValidator />
+          </div>
+
+          {/* 11. Worker Analytics Dashboard */}
+          <div id="worker-analytics">
+            <WorkerAnalytics />
+          </div>
+
+          {/* 12. Accountability Log */}
+          <div id="accountability-log">
+            <AccountabilityLog />
+          </div>
+        </main>
+      </div>
+
+      {/* Mobile overlay */}
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>}
+    </div>
+  );
+}
+
+// ============================================================================
+// 1. AT-A-GLANCE PRODUCTIVITY STRIP
+// ============================================================================
+function ProductivityStrip() {
+  const [summary, setSummary] = useState(null);
+
+  useEffect(() => {
+    fetchSummary();
+  }, []);
+
+  async function fetchSummary() {
+    // TODO: Replace with actual API call
+    // const response = await fetch('/api/summary');
+    // const data = await response.json();
+    const mockData = {
+      dueToday: 5,
+      overdue: 2,
+      weekProgress: 78,
+      alerts: [
+        'DPR rejected for Task #123',
+        'Missing evidence for milestone M5',
+        'Deadline approaching: Survey Zone A (2 days)',
+      ],
+    };
+    setSummary(mockData);
+  }
+
+  if (!summary) return <div className="productivity-strip">Loading summary...</div>;
+
+  return (
+    <section className="productivity-strip">
+      <div className="strip-item">
+        <span className="strip-label">Due Today</span>
+        <span className="strip-value">{summary.dueToday}</span>
+      </div>
+      <div className="strip-item">
+        <span className="strip-label">Overdue</span>
+        <span className="strip-value alert">{summary.overdue}</span>
+      </div>
+      <div className="strip-item">
+        <span className="strip-label">Week Progress</span>
+        <span className="strip-value">{summary.weekProgress}%</span>
+      </div>
+      <div className="strip-item alerts">
+        <span className="strip-label">Alerts</span>
+        <ul className="alert-list">
+          {summary.alerts.map((alert, idx) => (
+            <li key={idx}>{alert}</li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// 2. DPR UPLOAD WORKSPACE
+// ============================================================================
+function DPRWorkspace({ isOnline }) {
+  const [files, setFiles] = useState([]);
+  const [versions, setVersions] = useState([]);
+  const [status, setStatus] = useState('Draft');
+  const [comments, setComments] = useState([]);
+  const [autoScore, setAutoScore] = useState(null);
+
+  useEffect(() => {
+    fetchDPRStatus();
+    fetchDPRComments();
+  }, []);
+
+  async function uploadDPR(fileList) {
+    // TODO: Replace with actual API call
+    console.log('Uploading DPR files:', fileList);
+    
+    if (!isOnline) {
+      // Store in localStorage for offline mode
+      const drafts = JSON.parse(localStorage.getItem('offlineDrafts') || '[]');
+      drafts.push({ type: 'DPR', files: Array.from(fileList).map(f => f.name), timestamp: new Date() });
+      localStorage.setItem('offlineDrafts', JSON.stringify(drafts));
+      alert('Stored offline. Will sync when online.');
+      return;
+    }
+
+    // Mock upload
+    const newVersion = { id: versions.length + 1, name: `V${versions.length + 1}`, date: new Date().toLocaleString() };
+    setVersions([...versions, newVersion]);
+    setStatus('Submitted');
+    setAutoScore({ timeliness: 85, quality: 90 });
+  }
+
+  async function fetchDPRStatus() {
+    // TODO: API call
+    const mockStatus = 'Under Review';
+    setStatus(mockStatus);
+  }
+
+  async function fetchDPRComments() {
+    // TODO: API call
+    const mockComments = [
+      { id: 1, author: 'Manager A', text: 'Please add more details on section 3', timestamp: '2 hours ago' },
+      { id: 2, author: 'HQ Reviewer', text: 'Approved with minor notes', timestamp: '1 day ago' },
+    ];
+    setComments(mockComments);
+  }
+
+  function handleFileChange(e) {
+    const selectedFiles = Array.from(e.target.files);
+    setFiles(selectedFiles);
+  }
+
+  function handleUpload() {
+    if (files.length === 0) {
+      alert('Please select files to upload');
+      return;
+    }
+    uploadDPR(files);
+  }
+
+  return (
+    <section className="dpr-workspace">
+      <h2>📋 DPR Upload Workspace</h2>
+      
+      <div className="dpr-upload-area">
+        <input
+          type="file"
+          multiple
+          accept=".pdf,.xlsx,.xls,.ppt,.pptx,.jpg,.jpeg,.png,.mp4,.mov"
+          onChange={handleFileChange}
+          className="file-input"
+        />
+        <p className="upload-hint">Accepted: PDF, Excel, PPT, Images, Videos</p>
+        {files.length > 0 && (
+          <div className="selected-files">
+            <strong>Selected files:</strong>
+            <ul>
+              {files.map((file, idx) => (
+                <li key={idx}>{file.name}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <button onClick={handleUpload} className="upload-btn">
+          Upload DPR
+        </button>
+      </div>
+
+      <div className="dpr-status">
+        <h3>Status: <span className={`status-badge ${status.toLowerCase().replace(' ', '-')}`}>{status}</span></h3>
+      </div>
+
+      {autoScore && (
+        <div className="auto-score">
+          <h3>Auto-Score Preview</h3>
+          <p>Timeliness: {autoScore.timeliness}/100</p>
+          <p>Quality: {autoScore.quality}/100</p>
+        </div>
+      )}
+
+      <div className="dpr-versions">
+        <h3>Version History</h3>
+        {versions.length === 0 ? (
+          <p>No versions yet</p>
+        ) : (
+          <ul>
+            {versions.map((v) => (
+              <li key={v.id}>
+                {v.name} - {v.date}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="dpr-comments">
+        <h3>Reviewer Comments</h3>
+        {comments.length === 0 ? (
+          <p>No comments yet</p>
+        ) : (
+          <ul className="comment-thread">
+            {comments.map((c) => (
+              <li key={c.id} className="comment">
+                <strong>{c.author}</strong> ({c.timestamp})
+                <p>{c.text}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// 3. EVIDENCE CAPTURE PORTAL
+// ============================================================================
+function EvidencePortal({ isOnline }) {
+  const [evidence, setEvidence] = useState([]);
+  const [viewMode, setViewMode] = useState('gallery'); // 'gallery' or 'timeline'
+
+  useEffect(() => {
+    fetchEvidence();
+  }, []);
+
+  async function uploadEvidence(file, metadata) {
+    // TODO: Replace with actual API call
+    console.log('Uploading evidence:', file, metadata);
+
+    if (!isOnline) {
+      const drafts = JSON.parse(localStorage.getItem('offlineDrafts') || '[]');
+      drafts.push({ type: 'Evidence', file: file.name, metadata, timestamp: new Date() });
+      localStorage.setItem('offlineDrafts', JSON.stringify(drafts));
+      alert('Evidence stored offline. Will sync when online.');
+      return;
+    }
+
+    // Mock upload success
+    const newEvidence = {
+      id: evidence.length + 1,
+      name: file.name,
+      ...metadata,
+      aiFlag: Math.random() > 0.8, // Random AI flag
+    };
+    setEvidence([...evidence, newEvidence]);
+  }
+
+  async function fetchEvidence() {
+    // TODO: API call
+    const mockEvidence = [
+      {
+        id: 1,
+        name: 'site_photo_1.jpg',
+        date: '2025-12-08 10:30',
+        gps: '28.6139, 77.2090',
+        device: 'iPhone 13',
+        aiFlag: false,
+        taskId: 'T-101',
+      },
+      {
+        id: 2,
+        name: 'measurement_video.mp4',
+        date: '2025-12-08 11:15',
+        gps: '28.6200, 77.2100',
+        device: 'Samsung S21',
+        aiFlag: true,
+        taskId: 'T-102',
+      },
+    ];
+    setEvidence(mockEvidence);
+  }
+
+  function handleEvidenceUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Collect metadata
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const metadata = {
+          date: new Date().toLocaleString(),
+          gps: `${position.coords.latitude}, ${position.coords.longitude}`,
+          device: navigator.userAgent,
+          taskId: 'T-LINKED', // Would come from dropdown
+        };
+        uploadEvidence(file, metadata);
+      },
+      (error) => {
+        console.error('GPS error:', error);
+        const metadata = {
+          date: new Date().toLocaleString(),
+          gps: 'unavailable',
+          device: navigator.userAgent,
+          taskId: 'T-LINKED',
+        };
+        uploadEvidence(file, metadata);
+      }
+    );
+  }
+
+  return (
+    <section className="evidence-portal">
+      <h2>📸 Evidence Capture Portal</h2>
+
+      <div className="evidence-upload">
+        <input
+          type="file"
+          accept="image/*,video/*,.pdf"
+          onChange={handleEvidenceUpload}
+          className="file-input"
+        />
+        <p className="upload-hint">Upload photos, videos, or documents. GPS & metadata auto-collected.</p>
+      </div>
+
+      <div className="view-toggle">
+        <button
+          className={viewMode === 'gallery' ? 'active' : ''}
+          onClick={() => setViewMode('gallery')}
+        >
+          Gallery
+        </button>
+        <button
+          className={viewMode === 'timeline' ? 'active' : ''}
+          onClick={() => setViewMode('timeline')}
+        >
+          Timeline
+        </button>
+      </div>
+
+      <div className={`evidence-list ${viewMode}`}>
+        {evidence.length === 0 ? (
+          <p>No evidence uploaded yet</p>
+        ) : (
+          evidence.map((item) => (
+            <div key={item.id} className="evidence-item">
+              <strong>{item.name}</strong>
+              {item.aiFlag && <span className="ai-flag">⚠️ AI Flagged</span>}
+              <p>Date: {item.date}</p>
+              <p>GPS: {item.gps}</p>
+              <p>Device: {item.device}</p>
+              <p>Linked to: {item.taskId}</p>
+            </div>
+          ))
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// 4. TASK BOARD (Kanban + KPI Brain)
+// ============================================================================
+function TaskBoard() {
+  const [tasks, setTasks] = useState({ pending: [], inProgress: [], underReview: [], completed: [] });
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  async function fetchTasks() {
+    // TODO: API call
+    const mockTasks = {
+      pending: [
+        { id: 'T-101', title: 'Survey Zone A', duration: '3 days', deadline: '2025-12-10', progress: 0, dependencies: [] },
+      ],
+      inProgress: [
+        { id: 'T-102', title: 'Soil Testing Site B', duration: '5 days', deadline: '2025-12-12', progress: 60, dependencies: ['T-101'] },
+      ],
+      underReview: [
+        { id: 'T-103', title: 'DPR Submission Phase 1', duration: '2 days', deadline: '2025-12-09', progress: 100, dependencies: [] },
+      ],
+      completed: [
+        { id: 'T-100', title: 'Initial Assessment', duration: '2 days', deadline: '2025-12-05', progress: 100, dependencies: [] },
+      ],
+    };
+    setTasks(mockTasks);
+  }
+
+  async function updateTaskProgress(id, progress) {
+    // TODO: API call
+    console.log(`Updating task ${id} progress to ${progress}%`);
+  }
+
+  async function markTaskBlocker(id, reason) {
+    // TODO: API call
+    console.log(`Marking task ${id} as blocked: ${reason}`);
+    alert(`Task ${id} marked as blocked`);
+  }
+
+  function renderTaskCard(task) {
+    return (
+      <div key={task.id} className="task-card">
+        <h4>{task.title}</h4>
+        <p>ID: {task.id}</p>
+        <p>Duration: {task.duration}</p>
+        <p>Deadline: {task.deadline}</p>
+        <p>Progress: {task.progress}%</p>
+        <div className="progress-bar">
+          <div className="progress-fill" style={{ width: `${task.progress}%` }}></div>
+        </div>
+        {task.dependencies.length > 0 && (
+          <p className="dependencies">Depends on: {task.dependencies.join(', ')}</p>
+        )}
+        <div className="task-actions">
+          <button onClick={() => updateTaskProgress(task.id, task.progress + 10)}>
+            Update Progress
+          </button>
+          <button onClick={() => markTaskBlocker(task.id, 'Weather delay')}>
+            Mark Blocker
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <section className="task-board">
+      <h2>📊 Task Board</h2>
+      <div className="kanban-board">
+        <div className="kanban-column">
+          <h3>Pending</h3>
+          {tasks.pending.map(renderTaskCard)}
+        </div>
+        <div className="kanban-column">
+          <h3>In Progress</h3>
+          {tasks.inProgress.map(renderTaskCard)}
+        </div>
+        <div className="kanban-column">
+          <h3>Under Review</h3>
+          {tasks.underReview.map(renderTaskCard)}
+        </div>
+        <div className="kanban-column">
+          <h3>Completed</h3>
+          {tasks.completed.map(renderTaskCard)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// 5. PERSONAL KPI METER
+// ============================================================================
+function KPIMeter() {
+  const [kpi, setKpi] = useState(null);
+
+  useEffect(() => {
+    fetchKPI();
+  }, []);
+
+  async function fetchKPI() {
+    // TODO: API call
+    const mockKPI = {
+      score: 87,
+      timeliness: 90,
+      quality: 85,
+      accuracy: 88,
+      compliance: 84,
+      monthlyScores: [75, 78, 82, 85, 87],
+      teamAverage: 80,
+      insights: 'You are performing above team average. Focus on compliance to reach 90+.',
+    };
+    setKpi(mockKPI);
+  }
+
+  if (!kpi) return <div className="kpi-meter">Loading KPI...</div>;
+
+  return (
+    <section className="kpi-meter">
+      <h2>📈 Personal KPI Meter</h2>
+      <div className="kpi-score">
+        <div className="score-circle">
+          <span className="score">{kpi.score}</span>
+          <span className="score-label">/100</span>
+        </div>
+      </div>
+
+      <div className="kpi-breakdown">
+        <div className="kpi-item">
+          <span>Timeliness:</span>
+          <span>{kpi.timeliness}</span>
+        </div>
+        <div className="kpi-item">
+          <span>Quality:</span>
+          <span>{kpi.quality}</span>
+        </div>
+        <div className="kpi-item">
+          <span>Accuracy:</span>
+          <span>{kpi.accuracy}</span>
+        </div>
+        <div className="kpi-item">
+          <span>Compliance:</span>
+          <span>{kpi.compliance}</span>
+        </div>
+      </div>
+
+      <div className="kpi-chart">
+        <h3>Monthly Progress</h3>
+        <svg width="100%" height="150" viewBox="0 0 500 150">
+          {kpi.monthlyScores.map((score, idx) => (
+            <circle
+              key={idx}
+              cx={50 + idx * 100}
+              cy={150 - score}
+              r="5"
+              fill="#4CAF50"
+            />
+          ))}
+          <polyline
+            points={kpi.monthlyScores.map((score, idx) => `${50 + idx * 100},${150 - score}`).join(' ')}
+            fill="none"
+            stroke="#4CAF50"
+            strokeWidth="2"
+          />
+        </svg>
+      </div>
+
+      <div className="kpi-comparison">
+        <p>Your Score: <strong>{kpi.score}</strong></p>
+        <p>Team Average: <strong>{kpi.teamAverage}</strong></p>
+      </div>
+
+      <div className="kpi-insights">
+        <h3>Insights</h3>
+        <p>{kpi.insights}</p>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// 6. PROJECT TIMELINE + GANTT INTEGRATION
+// ============================================================================
+function ProjectTimeline() {
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  async function fetchProjects() {
+    // TODO: API call
+    const mockProjects = [
+      {
+        id: 'P-001',
+        name: 'Highway Expansion Project',
+        milestones: [
+          { name: 'Survey Complete', date: '2025-12-05', status: 'completed' },
+          { name: 'Soil Analysis', date: '2025-12-12', status: 'in-progress' },
+          { name: 'Foundation Work', date: '2025-12-20', status: 'pending' },
+        ],
+        assignedTasks: ['T-101', 'T-102'],
+        delayFlag: false,
+      },
+      {
+        id: 'P-002',
+        name: 'Bridge Construction',
+        milestones: [
+          { name: 'Site Preparation', date: '2025-11-30', status: 'completed' },
+          { name: 'Pillar Installation', date: '2025-12-15', status: 'delayed' },
+        ],
+        assignedTasks: ['T-103'],
+        delayFlag: true,
+      },
+    ];
+    setProjects(mockProjects);
+  }
+
+  return (
+    <section className="project-timeline">
+      <h2>🗓️ Project Timeline + Gantt</h2>
+      {projects.map((project) => (
+        <div key={project.id} className="project-item">
+          <h3>
+            {project.name} {project.delayFlag && <span className="delay-flag">🚨 Delayed</span>}
+          </h3>
+          <p>Project ID: {project.id}</p>
+          <div className="milestones">
+            <h4>Milestones</h4>
+            {project.milestones.map((milestone, idx) => (
+              <div key={idx} className={`milestone ${milestone.status}`}>
+                <span>{milestone.name}</span>
+                <span>{milestone.date}</span>
+              </div>
+            ))}
+          </div>
+          <p>Your Tasks: {project.assignedTasks.join(', ')}</p>
+          
+          {/* Simple Gantt Chart */}
+          <div className="gantt-chart">
+            <svg width="100%" height="100" viewBox="0 0 500 100">
+              {project.milestones.map((milestone, idx) => (
+                <rect
+                  key={idx}
+                  x={50 + idx * 150}
+                  y="30"
+                  width="120"
+                  height="40"
+                  fill={milestone.status === 'completed' ? '#4CAF50' : milestone.status === 'delayed' ? '#f44336' : '#FFC107'}
+                  stroke="#333"
+                />
+              ))}
+            </svg>
+          </div>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+// ============================================================================
+// 7. COMMUNICATION & CLARIFICATION HUB
+// ============================================================================
+function CommHub() {
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+
+  useEffect(() => {
+    fetchMessages();
+  }, []);
+
+  async function fetchMessages() {
+    // TODO: API call
+    const mockMessages = [
+      { id: 1, sender: 'Manager A', text: 'Please clarify the survey coordinates for Zone B', timestamp: '10:30 AM' },
+      { id: 2, sender: 'You', text: 'Coordinates are 28.6139, 77.2090', timestamp: '10:45 AM' },
+      { id: 3, sender: 'HQ Support', text: 'AI suggestion: Attach geo-tagged photo', timestamp: '11:00 AM', isAI: true },
+    ];
+    setMessages(mockMessages);
+  }
+
+  async function sendMessage() {
+    // TODO: API call
+    if (!newMessage.trim()) return;
+    
+    const message = {
+      id: messages.length + 1,
+      sender: 'You',
+      text: newMessage,
+      timestamp: new Date().toLocaleTimeString(),
+    };
+    setMessages([...messages, message]);
+    setNewMessage('');
+  }
+
+  return (
+    <section className="comm-hub">
+      <h2>💬 Communication & Clarification Hub</h2>
+      <div className="message-thread">
+        {messages.map((msg) => (
+          <div key={msg.id} className={`message ${msg.sender === 'You' ? 'own' : 'other'} ${msg.isAI ? 'ai' : ''}`}>
+            <strong>{msg.sender}</strong> <span className="timestamp">{msg.timestamp}</span>
+            <p>{msg.text}</p>
+          </div>
+        ))}
+      </div>
+      <div className="message-input">
+        <input
+          type="text"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="Type your message..."
+          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+        />
+        <button onClick={sendMessage}>Send</button>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// 8. NOTIFICATIONS CENTER
+// ============================================================================
+function Notifications() {
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  async function fetchNotifications() {
+    // TODO: API call
+    const mockNotifications = [
+      { id: 1, type: 'warning', text: 'Task T-102 at 70% with 2 days left', timestamp: '5 min ago' },
+      { id: 2, type: 'error', text: 'DPR missing geo-tagged photos', timestamp: '1 hour ago' },
+      { id: 3, type: 'info', text: 'Audit flagged your survey accuracy for review', timestamp: '3 hours ago' },
+      { id: 4, type: 'success', text: 'Evidence uploaded successfully', timestamp: '1 day ago' },
+    ];
+    setNotifications(mockNotifications);
+  }
+
+  return (
+    <section className="notifications-center">
+      <h2>🔔 Notifications</h2>
+      <div className="notification-list">
+        {notifications.length === 0 ? (
+          <p>No notifications</p>
+        ) : (
+          notifications.map((notif) => (
+            <div key={notif.id} className={`notification ${notif.type}`}>
+              <span className="notif-text">{notif.text}</span>
+              <span className="notif-time">{notif.timestamp}</span>
+            </div>
+          ))
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// 9. AI ASSISTANT ("Ask Prabhav")
+// ============================================================================
+function AskPrabhav() {
+  const [prompt, setPrompt] = useState('');
+  const [response, setResponse] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function queryPrabhav(userPrompt) {
+    // TODO: API call
+    setIsLoading(true);
+    console.log('Querying Prabhav AI:', userPrompt);
+    
+    // Mock response
+    setTimeout(() => {
+      let mockResponse = '';
+      if (userPrompt.toLowerCase().includes('draft dpr')) {
+        mockResponse = 'Generated DPR Draft:\n\n1. Introduction\n2. Survey Details\n3. Findings\n4. Recommendations';
+      } else if (userPrompt.toLowerCase().includes('summarize tasks')) {
+        mockResponse = 'You have 5 tasks due today, 2 overdue. Focus on T-102 (60% complete, deadline in 2 days).';
+      } else if (userPrompt.toLowerCase().includes('weak kpi')) {
+        mockResponse = 'Your compliance score (84) is below target. Consider reviewing submission guidelines.';
+      } else {
+        mockResponse = 'I can help with:\n- Generate draft DPR\n- Summarize tasks\n- Identify weak KPIs\n- Provide compliance tips';
+      }
+      setResponse(mockResponse);
+      setIsLoading(false);
+    }, 1500);
+  }
+
+  function handleAsk() {
+    if (!prompt.trim()) return;
+    queryPrabhav(prompt);
+  }
+
+  return (
+    <section className="ask-prabhav">
+      <h2>🤖 Ask Prabhav (AI Assistant)</h2>
+      <div className="ai-interface">
+        <input
+          type="text"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Ask anything: 'Generate draft DPR', 'Summarize my tasks'..."
+          onKeyPress={(e) => e.key === 'Enter' && handleAsk()}
+        />
+        <button onClick={handleAsk} disabled={isLoading}>
+          {isLoading ? 'Thinking...' : 'Ask'}
+        </button>
+      </div>
+      {response && (
+        <div className="ai-response">
+          <h3>Response:</h3>
+          <pre>{response}</pre>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ============================================================================
+// 10. COMPLIANCE VALIDATOR
+// ============================================================================
+function ComplianceValidator() {
+  const [validationResults, setValidationResults] = useState(null);
+
+  function validateDPR() {
+    // Mock validation logic
+    const issues = [];
+    
+    // Simulated checks
+    if (Math.random() > 0.7) issues.push('Missing page 3 - Survey details');
+    if (Math.random() > 0.8) issues.push('Incorrect file naming convention');
+    if (Math.random() > 0.6) issues.push('Date mismatch: Document date vs submission date');
+    if (Math.random() > 0.9) issues.push('Survey coordinates inconsistent with GPS metadata');
+
+    setValidationResults({
+      passed: issues.length === 0,
+      issues: issues,
+      suggestions: issues.length > 0 ? ['Review document completeness', 'Check naming: DPR_YYYY-MM-DD_ProjectID.pdf', 'Verify all dates match'] : [],
+    });
+  }
+
+  return (
+    <section className="compliance-validator">
+      <h2>✅ Compliance Validator</h2>
+      <button onClick={validateDPR} className="validate-btn">
+        Run Compliance Check
+      </button>
+
+      {validationResults && (
+        <div className={`validation-results ${validationResults.passed ? 'pass' : 'fail'}`}>
+          <h3>{validationResults.passed ? '✓ All checks passed!' : '⚠️ Issues found:'}</h3>
+          {!validationResults.passed && (
+            <>
+              <ul className="issue-list">
+                {validationResults.issues.map((issue, idx) => (
+                  <li key={idx}>{issue}</li>
+                ))}
+              </ul>
+              <h4>Suggestions:</h4>
+              <ul className="suggestion-list">
+                {validationResults.suggestions.map((suggestion, idx) => (
+                  <li key={idx}>{suggestion}</li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ============================================================================
+// 11. WORKER ANALYTICS DASHBOARD
+// ============================================================================
+function WorkerAnalytics() {
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
+
+  async function fetchAnalytics() {
+    // TODO: API call
+    const mockAnalytics = {
+      weeklyProgress: [65, 70, 75, 80, 85, 87, 90],
+      dprRejectionRate: 12,
+      avgSubmissionDelay: 1.5,
+      delayCauses: {
+        weather: 40,
+        mismatch: 25,
+        dependencies: 20,
+        other: 15,
+      },
+    };
+    setAnalytics(mockAnalytics);
+  }
+
+  if (!analytics) return <div className="worker-analytics">Loading analytics...</div>;
+
+  return (
+    <section className="worker-analytics">
+      <h2>📊 Worker Analytics Dashboard</h2>
+
+      <div className="analytics-grid">
+        <div className="analytics-card">
+          <h3>Weekly Progress</h3>
+          <svg width="100%" height="150" viewBox="0 0 350 150">
+            {analytics.weeklyProgress.map((value, idx) => (
+              <rect
+                key={idx}
+                x={10 + idx * 50}
+                y={150 - value}
+                width="40"
+                height={value}
+                fill="#4CAF50"
+              />
+            ))}
+          </svg>
+        </div>
+
+        <div className="analytics-card">
+          <h3>DPR Rejection Rate</h3>
+          <div className="stat-value">{analytics.dprRejectionRate}%</div>
+        </div>
+
+        <div className="analytics-card">
+          <h3>Avg Submission Delay</h3>
+          <div className="stat-value">{analytics.avgSubmissionDelay} days</div>
+        </div>
+
+        <div className="analytics-card">
+          <h3>Delay Causes Breakdown</h3>
+          <ul className="cause-list">
+            <li>Weather: {analytics.delayCauses.weather}%</li>
+            <li>Mismatch: {analytics.delayCauses.mismatch}%</li>
+            <li>Dependencies: {analytics.delayCauses.dependencies}%</li>
+            <li>Other: {analytics.delayCauses.other}%</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// 12. ACCOUNTABILITY LOG
+// ============================================================================
+function AccountabilityLog() {
+  const [logs, setLogs] = useState([]);
+
+  useEffect(() => {
+    fetchLog();
+  }, []);
+
+  async function fetchLog() {
+    // TODO: API call
+    const mockLogs = [
+      { id: 1, action: 'DPR uploaded', timestamp: '2025-12-08 10:30', user: 'field1', location: '192.168.1.10 / GPS: 28.6139, 77.2090' },
+      { id: 2, action: 'Task T-102 progress updated to 60%', timestamp: '2025-12-08 09:15', user: 'field1', location: '192.168.1.10 / GPS: 28.6200, 77.2100' },
+      { id: 3, action: 'Evidence photo uploaded', timestamp: '2025-12-08 08:00', user: 'field1', location: '192.168.1.10 / GPS: 28.6150, 77.2095' },
+    ];
+    setLogs(mockLogs);
+  }
+
+  return (
+    <section className="accountability-log">
+      <h2>📜 Accountability Log</h2>
+      <table className="log-table">
+        <thead>
+          <tr>
+            <th>Action</th>
+            <th>When</th>
+            <th>By Whom</th>
+            <th>From Where (IP/GPS)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {logs.map((log) => (
+            <tr key={log.id}>
+              <td>{log.action}</td>
+              <td>{log.timestamp}</td>
+              <td>{log.user}</td>
+              <td>{log.location}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+}
