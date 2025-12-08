@@ -1,13 +1,5 @@
 {
-  "version": 2,
- 
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "index.js"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
+  ]
 }
