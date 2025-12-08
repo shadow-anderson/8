@@ -1,0 +1,470 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Changed color scheme to purple and cream */
+body {
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #f5f1ed;
+  color: #2d2420;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+  display: flex;
+  /* height: 100vh; */
+  overflow: hidden;
+}
+
+/* Sidebar Styles */
+/* Updated sidebar background to purple gradient */
+.sidebar {
+  width: 280px;
+  height: 100vh;
+  background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
+  border-right: 1px solid #a78bfa;
+  padding: 20px 0;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-header {
+  padding: 0 20px 30px;
+  border-bottom: 1px solid #a78bfa;
+  margin-bottom: 20px;
+}
+
+/* Updated header text color to white for purple background */
+.sidebar-header h2 {
+  color: #fffff2;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 12px;
+}
+
+/* Updated nav item colors for purple and cream theme */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  color: #f5f1ed;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  text-align: left;
+  font-family: inherit;
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+.nav-item.active {
+  background-color: #7c3aed;
+  color: #ffffff;
+  border-left: 3px solid #c4b5fd;
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.nav-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.nav-label {
+  flex: 1;
+}
+
+/* Main Content */
+/* Updated content background to cream */
+.dashboard-content {
+  overflow: scroll;
+  height: 100vh;
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+  justify-content: center;
+}
+
+.content-section {
+  max-width: 1000px;
+  margin: auto;
+}
+
+/* Updated heading color to purple */
+.content-section h2 {
+  font-size: 28px;
+  margin-bottom: 30px;
+  color: #6d28d9;
+  font-weight: 600;
+}
+
+.dashboard-welcome {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.dashboard-welcome h1 {
+  font-size: 32px;
+  color: #6d28d9;
+  margin-bottom: 20px;
+}
+
+.dashboard-welcome p {
+  font-size: 16px;
+  color: #6b5d54;
+}
+
+/* Form Styles */
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 600px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Updated form label color */
+.form-group label {
+  color: #2d2420;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Updated form input colors for cream and purple theme */
+.form-group input,
+.form-group textarea {
+  padding: 10px 14px;
+  background-color: #ffffff;
+  border: 2px solid #e8dcd6;
+  border-radius: 6px;
+  color: #2d2420;
+  font-family: inherit;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #7c3aed;
+  background-color: #faf8f6;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+}
+
+/* Updated submit button to purple */
+.btn-submit {
+  padding: 12px 24px;
+  background-color: #7c3aed;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.btn-submit:hover {
+  background-color: #6d28d9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+/* Team Data Styles */
+.team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Updated accordion colors for cream and purple theme */
+.accordion-item {
+  border: 1px solid #e8dcd6;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 16px 20px;
+  background-color: #7c3aed;
+  border: none;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.accordion-header:hover {
+  background-color: #6d28d9;
+  padding-left: 24px;
+}
+
+.accordion-title {
+  flex: 1;
+  text-align: left;
+}
+
+.accordion-toggle {
+  transition: transform 0.3s ease;
+  font-size: 12px;
+  color: #ffffff;
+}
+
+.accordion-toggle.open {
+  transform: rotate(180deg);
+}
+
+/* Updated accordion content background to cream */
+.accordion-content {
+  padding: 20px;
+  background-color: #faf8f6;
+  border-top: 1px solid #e8dcd6;
+}
+
+.team-lead-section,
+.team-members-section {
+  margin-bottom: 20px;
+}
+
+/* Updated section headers to purple */
+.team-lead-section h4,
+.team-members-section h4 {
+  color: #7c3aed;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Updated member card colors */
+.member-card {
+  padding: 14px 16px;
+  background-color: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #e8dcd6;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.member-card:hover {
+  /* background-color: #faf8f6; */
+  border-color: #d4cac3;
+}
+
+.member-card.lead {
+  border-left: 3px solid #7c3aed;
+  background-color: #f3e8ff;
+}
+
+.member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Updated member name color to purple */
+.member-name {
+  color: #7c3aed;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.member-detail {
+  color: #6b5d54;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.member-detail strong {
+  color: #7c3aed;
+}
+.lead-info input{
+  padding: 3px;
+  width: 300px;
+  border: none;
+  background-color: #f3e8ff;
+}
+.member-info input{
+  padding: 3px;
+  width: 300px;
+  border: none;
+}
+/* Individual Data Styles */
+.search-box {
+  margin-bottom: 24px;
+}
+
+/* Updated search input for cream and purple theme */
+.search-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px 16px;
+  background-color: #ffffff;
+  border: 2px solid #e8dcd6;
+  border-radius: 6px;
+  color: #2d2420;
+  font-family: inherit;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #7c3aed;
+  background-color: #faf8f6;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+}
+
+.employee-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  gap: 20px;
+}
+
+/* Updated employee card background to white */
+.employee-card {
+  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e8dcd6;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+.employee-card input{
+  border: none;
+  width: 300px;
+}
+
+.employee-card:hover {
+  border-color: #d4cac3;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.1);
+  transform: translateY(-2px);
+}
+
+.employee-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e8dcd6;
+}
+
+/* Updated employee header color to purple */
+.employee-header h3 {
+  color: #7c3aed;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.employee-id {
+  background-color: #ede9fe;
+  color: #7c3aed;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.employee-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.employee-details p {
+  color: #6b5d54;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.employee-details strong {
+  color: #7c3aed;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f1ed;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4cac3;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c4b5aa;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #a78bfa;
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 0 12px;
+  }
+
+  .nav-item {
+    flex-shrink: 0;
+    min-width: 150px;
+  }
+
+  .dashboard-content {
+    padding: 20px;
+  }
+
+  .content-section h2 {
+    font-size: 22px;
+  }
+
+  .employee-list {
+    grid-template-columns: 1fr;
+  }
+}
