@@ -36,7 +36,7 @@ export const registerUser = async (req, res, next) => {
     }
 
     // Validate role
-    const validRoles = ['hq', 'field', 'manager'];
+    const validRoles = ['employee', 'manager'];
     if (!validRoles.includes(role)) {
       return res.status(400).json({ 
         error: 'Invalid role', 

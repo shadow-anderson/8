@@ -9,12 +9,13 @@ const UserSchema = new mongoose.Schema({
 
   role: { 
     type: String, 
-    enum: ["hq", "field", "manager"],
+    enum: ["employee", "manager"],
     required: true 
   },
 
   designation: String,
-  division: String,       // e.g., "Admin", "Design", "Survey"
+
+  division: String,       // e.g., "hq", "feild"
   team: String,           // e.g., "File Team A"
 
   manager_id: { type: String, ref: "User" },

@@ -1,6 +1,6 @@
 // User-related API endpoints
 import express from 'express';
-import { login } from '../controllers/userController.js';
+import { login, } from '../controllers/userController.js';
 // import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -20,7 +20,7 @@ router.post('/login', login);
 // router.get('/:id', authenticate, userController.getUserById);
 
 // POST /api/users - Create new user
-// router.post('/', userController.createUser);
+// router.post('/', userController .createUser);
 
 // PUT /api/users/:id - Update user
 // router.put('/:id', authenticate, userController.updateUser);
