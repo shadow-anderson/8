@@ -12,7 +12,7 @@ import { authenticate, authorize } from '../middleware/auth.js';
 const router = express.Router();
 
 // All evidence routes require authentication
-router.use(authenticate);
+// router.use(authenticate);
 
 /**
  * @route   POST /api/evidence
