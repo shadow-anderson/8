@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
     );
 
     if (foundUser) {
-      const userData = { username: foundUser.username, role: foundUser.role };
+      const userData = { id: foundUser.id, username: foundUser.username, role: foundUser.role };
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
       return { success: true, user: userData };

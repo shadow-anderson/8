@@ -119,57 +119,62 @@ export default function FieldWorkerDashboard() {
             <ProductivityStrip />
           </div>
 
-          {/* 2. DPR Upload Workspace */}
+          {/* 2. Tasks Section */}
+          <div id="tasks-section">
+            <TasksSection />
+          </div>
+
+          {/* 3. DPR Upload Workspace */}
           <div id="dpr-workspace">
             <DPRWorkspace isOnline={isOnline} />
           </div>
 
-          {/* 3. Evidence Capture Portal */}
+          {/* 4. Evidence Capture Portal */}
           <div id="evidence-portal">
             <EvidencePortal isOnline={isOnline} />
           </div>
 
-          {/* 4. Task Board */}
+          {/* 5. Task Board */}
           <div id="task-board">
             <TaskBoard />
           </div>
 
-          {/* 5. Personal KPI Meter */}
+          {/* 6. Personal KPI Meter */}
           <div id="kpi-meter">
             <KPIMeter />
           </div>
 
-          {/* 6. Project Timeline + Gantt */}
+          {/* 7. Project Timeline + Gantt */}
           <div id="project-timeline">
             <ProjectTimeline />
           </div>
 
-          {/* 7. Communication & Clarification Hub */}
+          {/* 8. Communication & Clarification Hub */}
           <div id="comm-hub">
             <CommHub />
           </div>
 
-          {/* 8. Notifications Center */}
+          {/* 9. Notifications Center */}
           <div id="notifications">
             <Notifications />
           </div>
 
-          {/* 9. AI Assistant */}
+          {/* 10. AI Assistant */}
           <div id="ask-prabhav">
             <AskPrabhav />
           </div>
 
-          {/* 10. Compliance Validator */}
+          {/* 11. Compliance Validator */}
           <div id="compliance-validator">
             <ComplianceValidator />
           </div>
 
-          {/* 11. Worker Analytics Dashboard */}
+          {/* 12. Worker Analytics Dashboard */}
           <div id="worker-analytics">
             <WorkerAnalytics />
           </div>
 
-          {/* 12. Accountability Log */}
+          {/* 13. Accountability Log */}
           <div id="accountability-log">
             <AccountabilityLog />
           </div>
@@ -238,7 +243,175 @@ function ProductivityStrip() {
 }
 
 // ============================================================================
-// 2. DPR UPLOAD WORKSPACE
+// 2. TASKS SECTION (TABLE FORMAT)
+// ============================================================================
+function TasksSection() {
+  const { user } = useAuth();
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserProjects = async () => {
+      if (!user?.id) {
+        console.log('User ID not available');
+        setLoading(false);
+        return;
+      }
+      
+      console.log('Fetching projects for user:', user);
+      
+      try {
+        const response = await fetch(`https://eight-csdo.onrender.com/api/projects/user/${user.id}`);
+        const data = await response.json();
+        console.log('User projects:', data);
+        
+        // Transform API data to tasks format
+        const transformedTasks = [];
+        
+        // Check if the response has a projects array
+        const projectsArray = data.projects || data;
+        
+        if (projectsArray && Array.isArray(projectsArray)) {
+          projectsArray.forEach(project => {
+            // Each project IS a task
+            transformedTasks.push({
+              id: project._id || project.id,
+              name: project.name || 'Unnamed Task',
+              description: project.description || 'No description available',
+              status: project.status || 'Pending',
+              priority: project.priority || 'Medium',
+              deadline: project.deadline ? new Date(project.deadline).toISOString().split('T')[0] : 
+                       project.end_date ? new Date(project.end_date).toISOString().split('T')[0] : 'N/A',
+              progress: project.progress || 0,
+              assignedDate: project.assignedDate ? new Date(project.assignedDate).toISOString().split('T')[0] : 
+                            project.start_date ? new Date(project.start_date).toISOString().split('T')[0] :
+                            project.createdAt ? new Date(project.createdAt).toISOString().split('T')[0] : 'N/A',
+              projectName: project.name || 'Unknown Project',
+              projectId: project._id || project.id,
+            });
+          });
+        }
+        
+        console.log('Transformed tasks:', transformedTasks);
+        setTasks(transformedTasks);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching user projects:', error);
+        setTasks([]);
+        setLoading(false);
+      }
+    };
+
+    fetchUserProjects();
+  }, [user]);
+
+  function getStatusClass(status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return 'status-completed';
+      case 'in progress':
+        return 'status-in-progress';
+      case 'under review':
+        return 'status-under-review';
+      case 'pending':
+        return 'status-pending';
+      default:
+        return '';
+    }
+  }
+
+  function getPriorityClass(priority) {
+    switch (priority.toLowerCase()) {
+      case 'high':
+        return 'priority-high';
+      case 'medium':
+        return 'priority-medium';
+      case 'low':
+        return 'priority-low';
+      default:
+        return '';
+    }
+  }
+
+  if (loading) {
+    return (
+      <section className="tasks-section">
+        <h2>📋 My Tasks</h2>
+        <p>Loading tasks...</p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="tasks-section">
+      <h2>📋 My Tasks</h2>
+      <div className="tasks-table-container">
+        <table className="tasks-table">
+          <thead>
+            <tr>
+              <th>Task ID</th>
+              <th>Task Name</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Progress</th>
+              <th>Deadline</th>
+              <th>Assigned Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tasks.length === 0 ? (
+              <tr>
+                <td colSpan="9" className="no-tasks">No tasks assigned yet</td>
+              </tr>
+            ) : (
+              tasks.map((task) => (
+                <tr key={task.id} className="task-row">
+                  <td className="task-id">{task.id}</td>
+                  <td className="task-name">{task.name}</td>
+                  <td className="task-description">{task.description}</td>
+                  <td>
+                    <span className={`status-badge ${getStatusClass(task.status)}`}>
+                      {task.status}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`priority-badge ${getPriorityClass(task.priority)}`}>
+                      {task.priority}
+                    </span>
+                  </td>
+                  <td className="task-progress">
+                    <div className="progress-bar-container">
+                      <div 
+                        className="progress-bar-fill" 
+                        style={{ width: `${task.progress}%` }}
+                      ></div>
+                      <span className="progress-text">{task.progress}%</span>
+                    </div>
+                  </td>
+                  <td className="task-deadline">{task.deadline}</td>
+                  <td className="task-assigned-date">{task.assignedDate}</td>
+                  <td className="task-actions">
+                    <button className="action-btn view-btn" title="View Details">
+                      👁️
+                    </button>
+                    <button className="action-btn update-btn" title="Update Progress">
+                      ✏️
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// 3. DPR UPLOAD WORKSPACE
 // ============================================================================
 function DPRWorkspace({ isOnline }) {
   const { user } = useAuth();
@@ -247,11 +420,82 @@ function DPRWorkspace({ isOnline }) {
   const [status, setStatus] = useState('Draft');
   const [comments, setComments] = useState([]);
   const [autoScore, setAutoScore] = useState(null);
+  const [availableTasks, setAvailableTasks] = useState([]);
+  const [selectedTaskId, setSelectedTaskId] = useState('');
 
   useEffect(() => {
     fetchDPRStatus();
     fetchDPRComments();
+    fetchUserTasks();
   }, []);
+
+  // Fetch user's tasks for selection
+  async function fetchUserTasks() {
+    if (!user?.id) return;
+    
+    try {
+      const response = await fetch(`https://eight-csdo.onrender.com/api/projects/user/${user.id}`);
+      const data = await response.json();
+      
+      const projectsArray = data.projects || data;
+      const tasks = [];
+      
+      if (projectsArray && Array.isArray(projectsArray)) {
+        projectsArray.forEach(project => {
+          tasks.push({
+            id: project._id || project.id,
+            name: project.name || 'Unnamed Task',
+          });
+        });
+      }
+      
+      setAvailableTasks(tasks);
+      if (tasks.length > 0) {
+        setSelectedTaskId(tasks[0].id);
+      }
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+    }
+  }
+
+  // Send evidence data to backend
+  async function sendEvidenceToBackend(fileUrl, fileName) {
+    if (!user?.id || !selectedTaskId) {
+      console.error('Missing user ID or task ID');
+      return { success: false, error: 'Missing required data' };
+    }
+
+    try {
+      const evidenceData = {
+        uploaded_by: user.id,
+        project_id: selectedTaskId,
+        file_url: fileUrl,
+        file_name: fileName,
+        upload_date: new Date().toISOString(),
+      };
+
+      console.log('Sending evidence to backend:', evidenceData);
+
+      const response = await fetch('https://eight-csdo.onrender.com/api/evidence', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(evidenceData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Backend error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Evidence saved to backend:', result);
+      return { success: true, data: result };
+    } catch (error) {
+      console.error('❌ Error sending evidence to backend:', error);
+      return { success: false, error: error.message };
+    }
+  }
 
   async function uploadDPR(fileList) {
     console.log('Uploading DPR files to Cloudinary:', fileList);
@@ -291,6 +535,16 @@ function DPRWorkspace({ isOnline }) {
       }
 
       if (successfulUploads.length > 0) {
+        // Send each uploaded file to backend
+        const backendPromises = successfulUploads.map(result => 
+          sendEvidenceToBackend(result.url, result.originalFilename)
+        );
+        
+        const backendResults = await Promise.all(backendPromises);
+        const successfulBackendUploads = backendResults.filter(r => r.success).length;
+        
+        console.log(`✅ ${successfulBackendUploads}/${successfulUploads.length} files saved to backend`);
+
         // Create new version with Cloudinary URLs
         const newVersion = {
           id: versions.length + 1,
@@ -315,7 +569,7 @@ function DPRWorkspace({ isOnline }) {
           console.log(`   Public ID: ${result.publicId}`);
         });
         
-        alert(`Successfully uploaded ${successfulUploads.length} file(s) to Cloudinary!\nCheck console for public URLs.`);
+        alert(`Successfully uploaded ${successfulUploads.length} file(s) to Cloudinary and saved ${successfulBackendUploads} to backend!\nCheck console for details.`);
       }
     } catch (error) {
       console.error('DPR upload error:', error);
@@ -355,6 +609,25 @@ function DPRWorkspace({ isOnline }) {
   return (
     <section className="dpr-workspace">
       <h2>📋 DPR Upload Workspace</h2>
+      
+      {/* Task Selection */}
+      {availableTasks.length > 0 && (
+        <div className="task-selection">
+          <label htmlFor="task-select">Select Task/Project:</label>
+          <select 
+            id="task-select"
+            value={selectedTaskId} 
+            onChange={(e) => setSelectedTaskId(e.target.value)}
+            className="task-select"
+          >
+            {availableTasks.map(task => (
+              <option key={task.id} value={task.id}>
+                {task.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       
       <div className="dpr-upload-area">
         <input
@@ -515,7 +788,7 @@ function EvidencePortal({ isOnline }) {
         };
         setEvidence([...evidence, newEvidence]);
 
-        
+
         
         // Log URL for easy access
         console.log('✅ Evidence uploaded successfully!');

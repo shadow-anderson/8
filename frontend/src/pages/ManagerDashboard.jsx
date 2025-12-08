@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import './ManagerDashboard.css';
@@ -14,6 +14,43 @@ const ManagerDashboard = () => {
     title: '',
     description: ''
   });
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch('https://eight-csdo.onrender.com/api/admin/users');
+        const data = await response.json();
+        console.log('Users from database:', data);
+        
+        let allUsers = [];
+        // Check if data is an array or if users are nested in a property
+        if (Array.isArray(data)) {
+          allUsers = data;
+        } else if (data.users && Array.isArray(data.users)) {
+          allUsers = data.users;
+        } else if (data.data && Array.isArray(data.data)) {
+          allUsers = data.data;
+        } else {
+          console.error('Unexpected data format:', data);
+          setUsers([]);
+          return;
+        }
+        
+        // Filter users with role 'employee'
+        const employees = allUsers.filter(user => user.role === 'employee');
+        console.log('Filtered employees:', employees);
+        setUsers(employees);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        setUsers([]);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -27,6 +64,14 @@ const ManagerDashboard = () => {
   const handleAssigneeSelect = (assignee) => {
     console.log('Creating task for:', assignee);
     setTaskAssignee(assignee);
+    
+    // Find the selected user's _id
+    const selectedUserObj = users.find(u => (u.username || u.name) === assignee);
+    if (selectedUserObj) {
+      setSelectedUserId(selectedUserObj._id || selectedUserObj.id);
+      setSelectedUser(assignee);
+    }
+    
     setShowTaskMenu(false);
     setShowSubMenu(null);
     setShowTaskForm(true);
@@ -45,27 +90,54 @@ const ManagerDashboard = () => {
     }));
   };
 
-  const handleSubmitTask = () => {
+  const handleSubmitTask = async () => {
     if (!taskData.title.trim() || !taskData.description.trim()) {
       alert('Please fill in both title and description');
       return;
     }
     
-    console.log('Task submitted:', {
-      assignee: taskAssignee,
-      ...taskData
-    });
+    if (!selectedUserId) {
+      alert('No user selected');
+      return;
+    }
     
-    // TODO: Send to backend API
-    alert('Task assigned successfully!');
-    
-    // Reset form
-    setShowTaskForm(false);
-    setTaskAssignee('');
-    setTaskData({
-      title: '',
-      description: ''
-    });
+    try {
+      const response = await fetch('https://eight-csdo.onrender.com/api/projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          owner_id: selectedUserId,
+          name: taskData.title,
+          description: taskData.description,
+          planned_end: '2',
+          project_type:'single'
+        })
+      });
+      
+      const data = await response.json();
+      console.log('Task creation response:', data);
+      
+      if (response.ok) {
+        alert('Task assigned successfully!');
+        
+        // Reset form
+        setShowTaskForm(false);
+        setTaskAssignee('');
+        setSelectedUser(null);
+        setSelectedUserId(null);
+        setTaskData({
+          title: '',
+          description: ''
+        });
+      } else {
+        alert('Failed to create task: ' + (data.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error creating task:', error);
+      alert('Error creating task. Please try again.');
+    }
   };
 
   const handleCancelTask = () => {
@@ -210,18 +282,21 @@ const ManagerDashboard = () => {
               {/* Sub Menu - Individual */}
               {showTaskMenu && showSubMenu === 'individual' && (
                 <div className="dropdown-submenu">
-                  <button 
-                    className="dropdown-item"
-                    onClick={() => handleAssigneeSelect('field1')}
-                  >
-                    field1
-                  </button>
-                  <button 
-                    className="dropdown-item"
-                    onClick={() => handleAssigneeSelect('field2')}
-                  >
-                    field2
-                  </button>
+                  {users.length > 0 ? (
+                    users.map((user) => (
+                      <button 
+                        key={user._id || user.id}
+                        className="dropdown-item"
+                        onClick={() => handleAssigneeSelect(user.username || user.name)}
+                      >
+                        {user.username || user.name}
+                      </button>
+                    ))
+                  ) : (
+                    <button className="dropdown-item" disabled>
+                      Loading users...
+                    </button>
+                  )}
                 </div>
               )}
 

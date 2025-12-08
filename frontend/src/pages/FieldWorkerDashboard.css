@@ -263,7 +263,200 @@ section h3 {
 }
 
 /* ============================================================================
-   2. DPR WORKSPACE
+   2. TASKS SECTION (TABLE FORMAT)
+   ============================================================================ */
+.tasks-section {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tasks-section h2 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tasks-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.tasks-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  font-size: 0.9rem;
+}
+
+.tasks-table thead {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.tasks-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.tasks-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.tasks-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.tasks-table td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.task-id {
+  font-weight: 600;
+  color: #667eea;
+}
+
+.task-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.task-description {
+  color: #666;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-badge,
+.priority-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-in-progress {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.status-under-review {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-pending {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.priority-high {
+  background: #ff5252;
+  color: white;
+}
+
+.priority-medium {
+  background: #ffa726;
+  color: white;
+}
+
+.priority-low {
+  background: #66bb6a;
+  color: white;
+}
+
+.progress-bar-container {
+  position: relative;
+  width: 100%;
+  height: 24px;
+  background: #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.3s ease;
+  border-radius: 12px;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #333;
+  text-shadow: 0 0 2px white;
+}
+
+.task-deadline,
+.task-assigned-date {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.task-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  background: none;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background: #f0f0f0;
+  border-color: #667eea;
+  transform: scale(1.1);
+}
+
+.view-btn:hover {
+  background: #e3f2fd;
+}
+
+.update-btn:hover {
+  background: #fff3e0;
+}
+
+.no-tasks {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+  font-style: italic;
+}
+
+/* ============================================================================
+   3. DPR WORKSPACE
    ============================================================================ */
 .dpr-workspace {
 }
