@@ -14,6 +14,7 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
+    if(username == "DBA") navigate("/dbadash")
 
     const result = login(username, password, role);
 

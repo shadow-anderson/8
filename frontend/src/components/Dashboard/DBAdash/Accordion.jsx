@@ -59,6 +59,8 @@ export default function Accordion({ title, teamLead, members }) {
               </div>
             ))}
           </div>
+
+          <div className=""></div>
         </div>
       )}
     </div>

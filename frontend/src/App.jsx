@@ -10,8 +10,11 @@ import HQWorkerDashboard from './pages/HQWorkerDashboard';
 import DbaDash from './components/Dashboard/DBAdash/DbaDash';
 import './App.css';
 
+import ChatBot from './components/AskPrabhav';
+
 function App() {
   return (
+    <>
     <AuthProvider>
       <Router>
         <Routes>
@@ -59,6 +62,9 @@ function App() {
         </Routes>
       </Router>
     </AuthProvider>
+
+    <ChatBot />
+    </>
   );
 }
 
