@@ -2,10 +2,8 @@ import mongoose from "mongoose";
 
 const KpiItemSchema = new mongoose.Schema({
   kpi_code: { type: String, required: true },  // e.g., "file_disposal_rate"
-  raw_value: { type: Number },                 // actual numeric result before normalization
-  score: { type: Number },                     // normalized 0–100 score
-  source_count: { type: Number, default: 0 },  // number of activities used in calculation
-  computed_at: { type: Date, default: Date.now }
+  computedValues: [ {type: Number} ],                 // actual numeric result before normalization
+ 
 }, { _id: false });
 
 const KpiSchema = new mongoose.Schema({

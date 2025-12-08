@@ -131,6 +131,30 @@ export const getProjectsByUserId = async (req, res, next) => {
 };
 
 /**
+ * Get all tasks/projects created by a manager
+ * GET /api/projects/manager/:managerId
+ */
+export const getProjectsByManager = async (req, res, next) => {
+  try {
+    const { managerId } = req.params;
+
+    // Find all projects where givenBy matches managerId
+    const projects = await Project.find({ givenBy: managerId })
+      .populate('owner_id', 'name email emp_code')
+      .populate('members', 'name email emp_code')
+      .populate('givenBy', 'name email emp_code')
+      .sort({ created_at: -1 });
+
+    res.json({
+      count: projects.length,
+      projects
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Update project
  * PUT /api/projects/:id
  */

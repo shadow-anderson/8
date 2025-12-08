@@ -4,6 +4,7 @@ import {
   getAllProjects,
   getProjectById,
   getProjectsByUserId,
+  getProjectsByManager,
   updateProject,
   deleteProject,
   updateMilestone,
@@ -39,6 +40,13 @@ router.get('/', getAllProjects);
  * @access  Authenticated users
  */
 router.get('/user/:userId', getProjectsByUserId);
+
+/**
+ * @route   GET /api/projects/manager/:managerId
+ * @desc    Get all tasks/projects created by a manager
+ * @access  Authenticated users
+ */
+router.get('/manager/:managerId', getProjectsByManager);
 
 /**
  * @route   GET /api/projects/:id

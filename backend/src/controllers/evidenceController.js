@@ -13,50 +13,66 @@ import Project from '../models/Project.js';
  */
 export const uploadEvidence = async (req, res, next) => {
   try {
-    const { 
-      uploaded_by, 
-      project_id, 
-      activity_id, 
-      file_url, 
-      mime, 
+    const {
+      project_id,
+      activity_id,
+      file_url,
+      mime,
       size,
-      gps 
+      gps
     } = req.body;
 
     // Validate required fields
     if (!file_url) {
       return res.status(400).json({
-        error: 'Missing required field',
-        required: ['file_url']
+        error: 'file_url is required'
       });
     }
 
-    // Get manager ID from project if project_id is provided
     let managerId = null;
+
+    // If project_id is provided, get the manager from project
     if (project_id) {
       const project = await Project.findById(project_id);
-      if (project && project.givenBy) {
-        managerId = project.givenBy;
+      
+      if (!project) {
+        return res.status(404).json({
+          error: 'Project not found'
+        });
       }
+
+      // Get managerId from project's givenBy field
+      managerId = project.givenBy;
+      
+      // Log for debugging
+      console.log('Project found:', project._id);
+      console.log('Manager ID from project.givenBy:', managerId);
     }
 
-    // Create new evidence
-    const newEvidence = await Evidence.create({
-      uploaded_by: uploaded_by || req.userId,
-      project_id: project_id || null,
-      activity_id: activity_id || null,
-      managerId: managerId,
+    // Create evidence
+    const evidence = await Evidence.create({
+      uploaded_by: req.userId,
+      project_id,
+      activity_id,
+      managerId: managerId || null, // Explicitly set managerId
       file_url,
-      mime: mime || null,
-      size: size || null,
-      gps: gps || null
+      mime,
+      size,
+      gps
     });
+
+    // Populate the evidence before sending response
+    const populatedEvidence = await Evidence.findById(evidence._id)
+      .populate('uploaded_by', 'name email emp_code')
+      .populate('project_id', 'name description')
+      .populate('managerId', 'name email emp_code');
 
     res.status(201).json({
       message: 'Evidence uploaded successfully',
-      evidence: newEvidence
+      evidence: populatedEvidence
     });
   } catch (error) {
+    console.error('Upload evidence error:', error);
     next(error);
   }
 };

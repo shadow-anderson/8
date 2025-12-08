@@ -8,7 +8,7 @@ const EvidenceSchema = new mongoose.Schema({
 
   managerId: { type: String, ref: "User" },
 
-  file_url: { type: String, required: true },
+  file_url: [{ type: String, required: true }],
   mime: String,
   size: Number,
 
