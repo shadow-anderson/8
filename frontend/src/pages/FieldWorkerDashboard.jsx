@@ -602,13 +602,13 @@ function EvidencePortal({ isOnline }) {
 
       <div className="view-toggle">
         <button
-          className={viewMode === 'gallery' ? 'active' : ''}
+          className={viewMode === 'gallery' ? 'active' : 'not-active'}
           onClick={() => setViewMode('gallery')}
         >
           Gallery
         </button>
         <button
-          className={viewMode === 'timeline' ? 'active' : ''}
+          className={viewMode === 'timeline' ? 'active' : 'not-active'}
           onClick={() => setViewMode('timeline')}
         >
           Timeline
@@ -791,6 +791,7 @@ function KPIMeter() {
 
       <div className="kpi-breakdown">
         <div className="kpi-item">
+          <div className="kpi-fill" style={{ width: `${kpi.timeliness}%` }}></div>
           <span>Timeliness:</span>
           <span>{kpi.timeliness}</span>
         </div>
@@ -836,7 +837,7 @@ function KPIMeter() {
 
       <div className="kpi-insights">
         <h3>Insights</h3>
-        <p>{kpi.insights}</p>
+        <p className="kpi-insights-para">{kpi.insights}</p>
       </div>
     </section>
   );
