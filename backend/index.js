@@ -46,12 +46,12 @@ mongoose
     console.log('✅ Connected to MongoDB');
     
     // Start server only in non-serverless environment
-    if (NODE_ENV !== 'production') {
+//    if (NODE_ENV !== 'production') {
       app.listen(PORT, () => {
         console.log(`🚀 Server running on port ${PORT}`);
         console.log(`📍 Environment: ${NODE_ENV}`);
       });
-    }
+//    }
   })
   .catch((error) => {
     console.error('❌ MongoDB connection error:', error);
