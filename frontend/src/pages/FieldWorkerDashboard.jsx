@@ -12,6 +12,7 @@ export default function FieldWorkerDashboard() {
   const navigate = useNavigate();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('dashboard');
 
   useEffect(() => {
     const handleOnline = () => {
@@ -34,29 +35,21 @@ export default function FieldWorkerDashboard() {
     navigate('/login');
   };
 
-  // Scroll to section smoothly
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setSidebarOpen(false); // Close mobile menu after clicking
-    }
-  };
-
   // Navigation items
   const navItems = [
-    { id: 'productivity-strip', label: '📊 Productivity Strip', icon: '📊' },
-    { id: 'dpr-workspace', label: '📋 DPR Workspace', icon: '📋' },
-    { id: 'evidence-portal', label: '📸 Evidence Portal', icon: '📸' },
-    { id: 'task-board', label: '📊 Task Board', icon: '📊' },
-    { id: 'kpi-meter', label: '📈 KPI Meter', icon: '📈' },
-    { id: 'project-timeline', label: '🗓️ Project Timeline', icon: '🗓️' },
-    { id: 'comm-hub', label: '💬 Communication Hub', icon: '💬' },
-    { id: 'notifications', label: '🔔 Notifications', icon: '🔔' },
-    { id: 'ask-prabhav', label: '🤖 AI Assistant', icon: '🤖' },
-    { id: 'compliance-validator', label: '✅ Compliance', icon: '✅' },
-    { id: 'worker-analytics', label: '📊 Analytics', icon: '📊' },
-    { id: 'accountability-log', label: '📜 Accountability', icon: '📜' },
+    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+    { id: 'productivity-strip', label: 'Productivity Strip', icon: '📊' },
+    { id: 'dpr-workspace', label: 'DPR Workspace', icon: '📋' },
+    { id: 'evidence-portal', label: 'Evidence Portal', icon: '📸' },
+    { id: 'task-board', label: 'Task Board', icon: '📊' },
+    { id: 'kpi-meter', label: 'KPI Meter', icon: '📈' },
+    { id: 'project-timeline', label: 'Project Timeline', icon: '🗓️' },
+    { id: 'comm-hub', label: 'Communication Hub', icon: '💬' },
+    { id: 'notifications', label: 'Notifications', icon: '🔔' },
+    { id: 'ask-prabhav', label: 'AI Assistant', icon: '🤖' },
+    { id: 'compliance-validator', label: 'Compliance', icon: '✅' },
+    { id: 'worker-analytics', label: 'Analytics', icon: '📊' },
+    { id: 'accountability-log', label: 'Accountability', icon: '📜' },
   ];
 
   // Offline data sync function
@@ -198,9 +191,6 @@ function ProductivityStrip() {
   }, []);
 
   async function fetchSummary() {
-    // TODO: Replace with actual API call
-    // const response = await fetch('/api/summary');
-    // const data = await response.json();
     const mockData = {
       dueToday: 5,
       overdue: 2,
@@ -214,29 +204,32 @@ function ProductivityStrip() {
     setSummary(mockData);
   }
 
-  if (!summary) return <div className="productivity-strip">Loading summary...</div>;
+  if (!summary) return <div className="content-section">Loading summary...</div>;
 
   return (
-    <section className="productivity-strip">
-      <div className="strip-item">
-        <span className="strip-label">Due Today</span>
-        <span className="strip-value">{summary.dueToday}</span>
-      </div>
-      <div className="strip-item">
-        <span className="strip-label">Overdue</span>
-        <span className="strip-value alert">{summary.overdue}</span>
-      </div>
-      <div className="strip-item">
-        <span className="strip-label">Week Progress</span>
-        <span className="strip-value">{summary.weekProgress}%</span>
-      </div>
-      <div className="strip-item alerts">
-        <span className="strip-label">Alerts</span>
-        <ul className="alert-list">
-          {summary.alerts.map((alert, idx) => (
-            <li key={idx}>{alert}</li>
-          ))}
-        </ul>
+    <section className="content-section productivity-strip cream-bg">
+      <h2>📊 Productivity Strip</h2>
+      <div className="strip-container cream-strip">
+        <div className="strip-item">
+          <span className="strip-label">Due Today</span>
+          <span className="strip-value">{summary.dueToday}</span>
+        </div>
+        <div className="strip-item">
+          <span className="strip-label">Overdue</span>
+          <span className="strip-value alert">{summary.overdue}</span>
+        </div>
+        <div className="strip-item">
+          <span className="strip-label">Week Progress</span>
+          <span className="strip-value">{summary.weekProgress}%</span>
+        </div>
+        <div className="strip-item alerts">
+          <span className="strip-label">Alerts</span>
+          <ul className="alert-list">
+            {summary.alerts.map((alert, idx) => (
+              <li key={idx}>{alert}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );
@@ -607,7 +600,7 @@ function DPRWorkspace({ isOnline }) {
   }
 
   return (
-    <section className="dpr-workspace">
+    <section className="content-section dpr-workspace">
       <h2>📋 DPR Upload Workspace</h2>
       
       {/* Task Selection */}
@@ -637,7 +630,6 @@ function DPRWorkspace({ isOnline }) {
           onChange={handleFileChange}
           className="file-input"
         />
-        <p className="upload-hint">Accepted: PDF, Excel, PPT, Images, Videos</p>
         {files.length > 0 && (
           <div className="selected-files">
             <strong>Selected files:</strong>
@@ -648,32 +640,37 @@ function DPRWorkspace({ isOnline }) {
             </ul>
           </div>
         )}
-        <button onClick={handleUpload} className="upload-btn">
+        <button onClick={handleUpload} className="upload-btn dpr-upload-btn">
           Upload DPR
         </button>
       </div>
-
       <div className="dpr-status">
         <h3>Status: <span className={`status-badge ${status.toLowerCase().replace(' ', '-')}`}>{status}</span></h3>
       </div>
-
       {autoScore && (
         <div className="auto-score">
           <h3>Auto-Score Preview</h3>
-          <p>Timeliness: {autoScore.timeliness}/100</p>
-          <p>Quality: {autoScore.quality}/100</p>
+          <div className="auto-score-grid">
+            <div>
+              <span className="auto-score-label">Timeliness</span>
+              <span className="auto-score-value">{autoScore.timeliness}/100</span>
+            </div>
+            <div>
+              <span className="auto-score-label">Quality</span>
+              <span className="auto-score-value">{autoScore.quality}/100</span>
+            </div>
+          </div>
         </div>
       )}
-
       <div className="dpr-versions">
         <h3>Version History</h3>
         {versions.length === 0 ? (
           <p>No versions yet</p>
         ) : (
-          <div>
+          <div className="dpr-versions-list">
             {versions.map((v) => (
-              <div key={v.id} className="version-item">
-                <h4>{v.name} - {v.date}</h4>
+              <div key={v.id} className="version-item version-item-spacious">
+                <h4>{v.name} <span className="version-date">{v.date}</span></h4>
                 {v.files && v.files.length > 0 && (
                   <div className="version-files">
                     <p><strong>Files ({v.files.length}):</strong></p>
@@ -716,7 +713,6 @@ function DPRWorkspace({ isOnline }) {
           </div>
         )}
       </div>
-
       <div className="dpr-comments">
         <h3>Reviewer Comments</h3>
         {comments.length === 0 ? (
@@ -860,7 +856,7 @@ function EvidencePortal({ isOnline }) {
   }
 
   return (
-    <section className="evidence-portal">
+    <section className="content-section evidence-portal">
       <h2>📸 Evidence Capture Portal</h2>
 
       <div className="evidence-upload">
@@ -938,7 +934,7 @@ function EvidencePortal({ isOnline }) {
 // 4. TASK BOARD (Kanban + KPI Brain)
 // ============================================================================
 function TaskBoard() {
-  const [tasks, setTasks] = useState({ pending: [], inProgress: [], underReview: [], completed: [] });
+  const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
     fetchTasks();
@@ -946,80 +942,156 @@ function TaskBoard() {
 
   async function fetchTasks() {
     // TODO: API call
-    const mockTasks = {
-      pending: [
-        { id: 'T-101', title: 'Survey Zone A', duration: '3 days', deadline: '2025-12-10', progress: 0, dependencies: [] },
-      ],
-      inProgress: [
-        { id: 'T-102', title: 'Soil Testing Site B', duration: '5 days', deadline: '2025-12-12', progress: 60, dependencies: ['T-101'] },
-      ],
-      underReview: [
-        { id: 'T-103', title: 'DPR Submission Phase 1', duration: '2 days', deadline: '2025-12-09', progress: 100, dependencies: [] },
-      ],
-      completed: [
-        { id: 'T-100', title: 'Initial Assessment', duration: '2 days', deadline: '2025-12-05', progress: 100, dependencies: [] },
-      ],
-    };
+    const mockTasks = [
+      {
+        id: 'T-101',
+        title: 'Survey Zone A',
+        duration: '3 days',
+        deadline: '2025-12-10',
+        progress: 0,
+        status: 'pending',
+        priority: 'high',
+        dependencies: [],
+      },
+      {
+        id: 'T-102',
+        title: 'Soil Testing Site B',
+        duration: '5 days',
+        deadline: '2025-12-12',
+        progress: 60,
+        status: 'in-progress',
+        priority: 'medium',
+        dependencies: ['T-101'],
+      },
+      {
+        id: 'T-103',
+        title: 'DPR Submission Phase 1',
+        duration: '2 days',
+        deadline: '2025-12-09',
+        progress: 100,
+        status: 'completed',
+        priority: 'low',
+        dependencies: [],
+      },
+      {
+        id: 'T-100',
+        title: 'Initial Assessment',
+        duration: '2 days',
+        deadline: '2025-12-05',
+        progress: 100,
+        status: 'completed',
+        priority: 'low',
+        dependencies: [],
+      },
+    ];
     setTasks(mockTasks);
   }
 
-  async function updateTaskProgress(id, progress) {
-    // TODO: API call
-    console.log(`Updating task ${id} progress to ${progress}%`);
+  function getStatusBadge(status) {
+    switch (status) {
+      case 'pending':
+        return <span className="hq-status-badge hq-badge-pending">Pending</span>;
+      case 'in-progress':
+        return <span className="hq-status-badge hq-badge-progress">In Progress</span>;
+      case 'completed':
+        return <span className="hq-status-badge hq-badge-completed">Completed</span>;
+      case 'under-review':
+        return <span className="hq-status-badge hq-badge-review">Under Review</span>;
+      case 'overdue':
+        return <span className="hq-status-badge hq-badge-overdue">Overdue</span>;
+      default:
+        return <span className="hq-status-badge">{status}</span>;
+    }
   }
 
-  async function markTaskBlocker(id, reason) {
-    // TODO: API call
-    console.log(`Marking task ${id} as blocked: ${reason}`);
-    alert(`Task ${id} marked as blocked`);
+  function getPriorityBadge(priority) {
+    switch (priority) {
+      case 'high':
+        return <span className="hq-priority-badge hq-priority-high">High</span>;
+      case 'medium':
+        return <span className="hq-priority-badge hq-priority-medium">Medium</span>;
+      case 'low':
+        return <span className="hq-priority-badge hq-priority-low">Low</span>;
+      case 'critical':
+        return <span className="hq-priority-badge hq-priority-critical">Critical</span>;
+      default:
+        return <span className="hq-priority-badge">{priority}</span>;
+    }
   }
 
-  function renderTaskCard(task) {
-    return (
-      <div key={task.id} className="task-card">
-        <h4>{task.title}</h4>
-        <p>ID: {task.id}</p>
-        <p>Duration: {task.duration}</p>
-        <p>Deadline: {task.deadline}</p>
-        <p>Progress: {task.progress}%</p>
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: `${task.progress}%` }}></div>
-        </div>
-        {task.dependencies.length > 0 && (
-          <p className="dependencies">Depends on: {task.dependencies.join(', ')}</p>
-        )}
-        <div className="task-actions">
-          <button onClick={() => updateTaskProgress(task.id, task.progress + 10)}>
-            Update Progress
-          </button>
-          <button onClick={() => markTaskBlocker(task.id, 'Weather delay')}>
-            Mark Blocker
-          </button>
-        </div>
-      </div>
+  function handleProgress(id, progress) {
+    // TODO: API call
+    setTasks(tasks =>
+      tasks.map(task =>
+        task.id === id
+          ? { ...task, progress: Math.min(progress, 100), status: progress === 100 ? 'completed' : task.status }
+          : task
+      )
     );
   }
 
+  function handleBlocker(id, reason) {
+    // TODO: API call
+    alert(`Task ${id} marked as blocked: ${reason}`);
+  }
+
   return (
-    <section className="task-board">
+    <section className="content-section task-board">
       <h2>📊 Task Board</h2>
-      <div className="kanban-board">
-        <div className="kanban-column">
-          <h3>Pending</h3>
-          {tasks.pending.map(renderTaskCard)}
-        </div>
-        <div className="kanban-column">
-          <h3>In Progress</h3>
-          {tasks.inProgress.map(renderTaskCard)}
-        </div>
-        <div className="kanban-column">
-          <h3>Under Review</h3>
-          {tasks.underReview.map(renderTaskCard)}
-        </div>
-        <div className="kanban-column">
-          <h3>Completed</h3>
-          {tasks.completed.map(renderTaskCard)}
-        </div>
+      <div className="hq-table-wrapper">
+        <table className="hq-task-table">
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>ID</th>
+              <th>Duration</th>
+              <th>Deadline</th>
+              <th>Priority</th>
+              <th>Progress</th>
+              <th>Status</th>
+              <th>Dependencies</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tasks.map(task => (
+              <tr key={task.id}>
+                <td className="hq-task-title">{task.title}</td>
+                <td>{task.id}</td>
+                <td>{task.duration}</td>
+                <td>{task.deadline}</td>
+                <td>{getPriorityBadge(task.priority)}</td>
+                <td>
+                  <div className="hq-progress-bar">
+                    <div
+                      className="hq-progress-fill"
+                      style={{ width: `${task.progress}%` }}
+                    ></div>
+                    <span className="hq-progress-text">{task.progress}%</span>
+                  </div>
+                </td>
+                <td>{getStatusBadge(task.status)}</td>
+                <td>
+                  {task.dependencies.length > 0 ? task.dependencies.join(', ') : '—'}
+                </td>
+                <td>
+                  <button
+                    className="hq-filter-btn"
+                    onClick={() => handleProgress(task.id, task.progress + 10)}
+                  >
+                    Update Progress
+                  </button>
+                  <button
+                    className="hq-filter-btn"
+                    onClick={() => handleBlocker(task.id, 'Weather delay')}
+                  >
+                    Mark Blocker
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </section>
   );
@@ -1053,11 +1125,11 @@ function KPIMeter() {
   if (!kpi) return <div className="kpi-meter">Loading KPI...</div>;
 
   return (
-    <section className="kpi-meter">
+    <section className="content-section kpi-meter">
       <h2>📈 Personal KPI Meter</h2>
       <div className="kpi-score">
         <div className="score-circle">
-          <span className="score">{kpi.score}</span>
+          <span className="score">KPI Score: {kpi.score}</span>
           <span className="score-label">/100</span>
         </div>
       </div>
@@ -1083,6 +1155,9 @@ function KPIMeter() {
 
       <div className="kpi-chart">
         <h3>Monthly Progress</h3>
+        <h1 style={{margin:'auto', textAlign:'center'}}>
+          <span className="score">KPI Score: {kpi.score}/100</span>
+        </h1>
         <svg width="100%" height="150" viewBox="0 0 500 150">
           {kpi.monthlyScores.map((score, idx) => (
             <circle
@@ -1154,43 +1229,35 @@ function ProjectTimeline() {
   }
 
   return (
-    <section className="project-timeline">
-      <h2>🗓️ Project Timeline + Gantt</h2>
-      {projects.map((project) => (
-        <div key={project.id} className="project-item">
-          <h3>
-            {project.name} {project.delayFlag && <span className="delay-flag">🚨 Delayed</span>}
-          </h3>
-          <p>Project ID: {project.id}</p>
-          <div className="milestones">
-            <h4>Milestones</h4>
-            {project.milestones.map((milestone, idx) => (
-              <div key={idx} className={`milestone ${milestone.status}`}>
-                <span>{milestone.name}</span>
-                <span>{milestone.date}</span>
-              </div>
-            ))}
+    <section className="content-section project-timeline">
+      <h2>🗓️ Project Timeline</h2>
+      <div className="project-list">
+        {projects.map((project) => (
+          <div key={project.id} className="project-item project-item-spacious">
+            <h3>
+              {project.name} {project.delayFlag && <span className="delay-flag">🚨 Delayed</span>}
+            </h3>
+            <div className="project-details">
+              <p><strong>Project ID:</strong> {project.id}</p>
+              <p><strong>Your Tasks:</strong> {project.assignedTasks.join(', ')}</p>
+            </div>
+            <div className="milestones">
+              <h4>Milestones</h4>
+              <ul className="milestone-list">
+                {project.milestones.map((milestone, idx) => (
+                  <li key={idx} className={`milestone milestone-spacious ${milestone.status}`}>
+                    <span className="milestone-name">{milestone.name}</span>
+                    <span className="milestone-date">{milestone.date}</span>
+                    <span className={`milestone-status status-${milestone.status}`}>
+                      {milestone.status.replace('-', ' ')}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <p>Your Tasks: {project.assignedTasks.join(', ')}</p>
-          
-          {/* Simple Gantt Chart */}
-          <div className="gantt-chart">
-            <svg width="100%" height="100" viewBox="0 0 500 100">
-              {project.milestones.map((milestone, idx) => (
-                <rect
-                  key={idx}
-                  x={50 + idx * 150}
-                  y="30"
-                  width="120"
-                  height="40"
-                  fill={milestone.status === 'completed' ? '#4CAF50' : milestone.status === 'delayed' ? '#f44336' : '#FFC107'}
-                  stroke="#333"
-                />
-              ))}
-            </svg>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </section>
   );
 }
@@ -1231,7 +1298,7 @@ function CommHub() {
   }
 
   return (
-    <section className="comm-hub">
+    <section className="content-section comm-hub">
       <h2>💬 Communication & Clarification Hub</h2>
       <div className="message-thread">
         {messages.map((msg) => (
@@ -1277,7 +1344,7 @@ function Notifications() {
   }
 
   return (
-    <section className="notifications-center">
+    <section className="content-section notifications-center">
       <h2>🔔 Notifications</h2>
       <div className="notification-list">
         {notifications.length === 0 ? (
@@ -1331,7 +1398,7 @@ function AskPrabhav() {
   }
 
   return (
-    <section className="ask-prabhav">
+    <section className="content-section ask-prabhav">
       <h2>🤖 Ask Prabhav (AI Assistant)</h2>
       <div className="ai-interface">
         <input
@@ -1379,7 +1446,7 @@ function ComplianceValidator() {
   }
 
   return (
-    <section className="compliance-validator">
+    <section className="content-section compliance-validator">
       <h2>✅ Compliance Validator</h2>
       <button onClick={validateDPR} className="validate-btn">
         Run Compliance Check
@@ -1438,7 +1505,7 @@ function WorkerAnalytics() {
   if (!analytics) return <div className="worker-analytics">Loading analytics...</div>;
 
   return (
-    <section className="worker-analytics">
+    <section className="content-section worker-analytics">
       <h2>📊 Worker Analytics Dashboard</h2>
 
       <div className="analytics-grid">
@@ -1503,7 +1570,7 @@ function AccountabilityLog() {
   }
 
   return (
-    <section className="accountability-log">
+    <section className="content-section accountability-log">
       <h2>📜 Accountability Log</h2>
       <table className="log-table">
         <thead>

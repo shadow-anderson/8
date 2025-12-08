@@ -2,10 +2,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
+//dashboard
 import AdminDashboard from './pages/AdminDashboard';
 import ManagerDashboard from './pages/ManagerDashboard';
 import FieldWorkerDashboard from './pages/FieldWorkerDashboard';
-import HQWorkerDashboard from './pages/HQWorkerDashboard';
+import DbaDash from './components/Dashboard/DBAdash/DbaDash';
+import HqDash from './components/Dashboard/DBhq/HqDash';
 import './App.css';
 
 function App() {
@@ -13,6 +15,9 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
+          <Route path='/dbadash' element = {<DbaDash/>}/>
+          <Route path='/hqdash' element = {<HqDash/>}/>
+
           <Route path="/login" element={<Login />} />
           
           <Route
@@ -38,15 +43,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <FieldWorkerDashboard />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/hqWorkerDashboard"
-            element={
-              <ProtectedRoute>
-                <HQWorkerDashboard />
               </ProtectedRoute>
             }
           />
