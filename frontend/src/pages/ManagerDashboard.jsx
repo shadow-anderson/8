@@ -21,6 +21,115 @@ const ManagerDashboard = () => {
   const [dprEvaluationData, setDprEvaluationData] = useState(null);
   const [kpiResult, setKpiResult] = useState(null);
   const [isAnalyzingDpr, setIsAnalyzingDpr] = useState(false);
+  const [tasks, setTasks] = useState({ pending: [], inProgress: [], underReview: [], completed: [] });
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  async function fetchTasks() {
+    try {
+      const response = await fetch('https://eight-csdo.onrender.com/api/projects');
+      const data = await response.json();
+      console.log('Projects/Tasks from database:', data);
+      
+      let allProjects = [];
+      if (Array.isArray(data)) {
+        allProjects = data;
+      } else if (data.projects && Array.isArray(data.projects)) {
+        allProjects = data.projects;
+      } else if (data.data && Array.isArray(data.data)) {
+        allProjects = data.data;
+      }
+      
+      // Categorize tasks based on progress/status
+      const categorized = {
+        pending: allProjects.filter(p => p.progress === 0 || p.progress === undefined),
+        inProgress: allProjects.filter(p => p.progress > 0 && p.progress < 80),
+        underReview: allProjects.filter(p => p.progress >= 80 && p.progress < 100),
+        completed: allProjects.filter(p => p.progress === 100),
+      };
+      
+      setTasks(categorized);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+    }
+  }
+
+  async function updateTaskProgress(taskId, newProgress) {
+    try {
+      const response = await fetch(`https://eight-csdo.onrender.com/api/projects/${taskId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          progress: Math.min(newProgress, 100)
+        })
+      });
+      
+      if (response.ok) {
+        alert('Task progress updated successfully!');
+        fetchTasks(); // Refresh tasks
+      } else {
+        alert('Failed to update task progress');
+      }
+    } catch (error) {
+      console.error('Error updating task progress:', error);
+      alert('Error updating task progress');
+    }
+  }
+
+  async function markTaskBlocker(taskId, reason) {
+    try {
+      const response = await fetch(`https://eight-csdo.onrender.com/api/projects/${taskId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: 'blocked',
+          blockerReason: reason
+        })
+      });
+      
+      if (response.ok) {
+        alert(`Task ${taskId} marked as blocked: ${reason}`);
+        fetchTasks(); // Refresh tasks
+      } else {
+        alert('Failed to mark task as blocked');
+      }
+    } catch (error) {
+      console.error('Error marking task as blocked:', error);
+      alert('Error marking task as blocked');
+    }
+  }
+
+  function renderTaskCard(task) {
+    return (
+      <div key={task._id} className="task-card">
+        <h4>{task.name}</h4>
+        <p>ID: {task._id?.substring(0, 8)}</p>
+        <p>Owner: {task.owner_id?.name || task.owner_id?.username || 'Unknown'}</p>
+        <p>Deadline: {task.planned_end ? `${task.planned_end} days` : 'Not set'}</p>
+        <p>Progress: {task.progress || 0}%</p>
+        <div className="progress-bar">
+          <div className="progress-fill" style={{ width: `${task.progress || 0}%` }}></div>
+        </div>
+        {task.description && (
+          <p className="task-description">{task.description}</p>
+        )}
+        <div className="task-actions">
+          <button onClick={() => updateTaskProgress(task._id, (task.progress || 0) + 10)}>
+            Update Progress
+          </button>
+          <button onClick={() => markTaskBlocker(task._id, 'Pending review')}>
+            Mark Blocker
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     const fetchManagerEvidence = async () => {
@@ -142,8 +251,11 @@ const ManagerDashboard = () => {
       const data = await response.json();
       console.log('Task creation response:', data);
       
-      if (response.ok) {
+              if (response.ok) {
         alert('Task assigned successfully!');
+        
+        // Refresh tasks
+        fetchTasks();
         
         // Reset form
         setShowTaskForm(false);
@@ -455,7 +567,47 @@ const ManagerDashboard = () => {
           </div>
         </section>
 
-        {/* Task Section */}
+        {/* Task Board Section */}
+        <section className="dashboard-section task-board-section">
+          <div className="section-header">
+            <div className="section-title-group">
+              <div className="section-icon">📊</div>
+              <div>
+                <h2>Task Board</h2>
+                <p className="section-subtitle">Track and manage all project tasks</p>
+              </div>
+            </div>
+            <button className="refresh-btn" onClick={fetchTasks}>🔄 Refresh</button>
+          </div>
+          <div className="kanban-board">
+            <div className="kanban-column">
+              <h3>Pending ({tasks.pending.length})</h3>
+              <div className="kanban-column-content">
+                {tasks.pending.length > 0 ? tasks.pending.map(renderTaskCard) : <p className="empty-state">No pending tasks</p>}
+              </div>
+            </div>
+            <div className="kanban-column">
+              <h3>In Progress ({tasks.inProgress.length})</h3>
+              <div className="kanban-column-content">
+                {tasks.inProgress.length > 0 ? tasks.inProgress.map(renderTaskCard) : <p className="empty-state">No tasks in progress</p>}
+              </div>
+            </div>
+            <div className="kanban-column">
+              <h3>Under Review ({tasks.underReview.length})</h3>
+              <div className="kanban-column-content">
+                {tasks.underReview.length > 0 ? tasks.underReview.map(renderTaskCard) : <p className="empty-state">No tasks under review</p>}
+              </div>
+            </div>
+            <div className="kanban-column">
+              <h3>Completed ({tasks.completed.length})</h3>
+              <div className="kanban-column-content">
+                {tasks.completed.length > 0 ? tasks.completed.map(renderTaskCard) : <p className="empty-state">No completed tasks</p>}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Task Assignment Section */}
         <section className="dashboard-section">
           <div className="section-header">
             <div className="section-title-group">
