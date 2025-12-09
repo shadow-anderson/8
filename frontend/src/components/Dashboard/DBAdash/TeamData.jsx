@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import Accordion from "./accordion"
+import Accordion from "./Accordion"
 
 export default function TeamData() {
   const [teams] = useState([
