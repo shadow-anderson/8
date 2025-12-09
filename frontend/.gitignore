@@ -28,3 +28,4 @@ src/assets/Sample_DPR_New.pdf
 src/assets/Sample_DPR.pdf
 
 .vite
+src/assets/*

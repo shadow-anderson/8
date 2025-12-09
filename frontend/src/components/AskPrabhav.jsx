@@ -10,14 +10,22 @@ export default function AskPrabhav() {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    // Add user's message
-    const userMsg = { sender: "user", text: input };
-    setMessages((prev) => [...prev, userMsg]);
+    // const UserPrompt = "You are AskPrabhav, an AI assistant for users of this employee-productivity-measurement platform. Your job is to help users with questions related to their work, productivity, planning, and general guidance. Be clear, concise, and practical. If information is missing, ask a brief clarifying question.";
+    const UserPrompt = `You are AskPrabhav, an AI assistant for this platform. You provide accurate, practical, and professional guidance based strictly on the provided user context. Do not assume details that are not explicitly stated.`;
+
+    const email = "field1@gmail.com"; // TODO: get from auth context
+    const dbData = await fetchUserContext(email);
+    const userContext = formatUserContext(dbData);
+
+    const finalPrompt = `${UserPrompt}; ${userContext}; User question:${input}`;
     setInput(""); // clear input while waiting
+
+    const typingMsg = { sender: "bot", text: "Typing..." };
+    setMessages(prev => [...prev, typingMsg]);
 
     try {
       // Call Gemini
-      const result = await geminiModel.generateContent([input]);
+      const result = await geminiModel.generateContent([finalPrompt]);
       const text = await result.response.text?.() || JSON.stringify(result.response);
 
       const botMsg = { sender: "bot", text };
@@ -153,25 +161,43 @@ export default function AskPrabhav() {
   );
 }
 
-const sendMessage = async () => {
-  if (!input.trim()) return;
+async function fetchUserContext(email) {
+  const res = await fetch(
+    "https://eight-csdo.onrender.com/api/users/get-by-email",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    }
+  );
 
-  // Add user's message
-  const userMsg = { sender: "user", text: input };
-  setMessages((prev) => [...prev, userMsg]);
-
-  setInput(""); // clear input while waiting for response
-
-  try {
-    // Call Gemini
-    const result = await genAIModel.generateContent([input]);
-    const text = await result.response.text?.() || JSON.stringify(result.response);
-
-    const botMsg = { sender: "bot", text };
-    setMessages((prev) => [...prev, botMsg]);
-  } catch (err) {
-    const botMsg = { sender: "bot", text: "Error: " + (err?.message || String(err)) };
-    setMessages((prev) => [...prev, botMsg]);
-    console.error("Gemini error:", err);
+  if (!res.ok) {
+    throw new Error("Failed to fetch user context");
   }
-};
+
+  return res.json(); // { message, user, team }
+}
+
+function formatUserContext(dbResponse) {
+  if (!dbResponse?.user) {
+    return "User context not available.";
+  }
+
+  const { user, team } = dbResponse;
+
+  return `
+User profile:
+- Name: ${user.name}
+- Email: ${user.email}
+- Role: ${user.role}
+- Employee code: ${user.emp_code || "N/A"}
+
+${team ? `
+Team context:
+- Team name: ${team.name || "N/A"}
+- Team role: ${team.role || "N/A"}
+` : ""}
+`;
+}
