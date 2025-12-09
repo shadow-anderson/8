@@ -8,6 +8,80 @@ import Project from '../models/Project.js';
  */
 
 /**
+ * Compute VASA (Variability-Adjusted Stability Analysis) Score
+ * @param {Object} params - Object with parameter arrays (p1, p2, p3, p4, p5)
+ * @returns {Number} KPI score (0-100)
+ */
+function computeVASA(params) {
+  // params = { p1: [...5 numbers], p2: [...], ..., p5: [...] }
+  
+  const paramArrays = Object.values(params);
+  
+  // -----------------------------
+  // Helper Functions
+  // -----------------------------
+  const mean = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+  
+  const variance = arr => {
+    const m = mean(arr);
+    return mean(arr.map(x => (x - m) ** 2));
+  };
+  
+  // absolute z-score mean
+  const absZScoreMean = arr => {
+    const m = mean(arr);
+    const sd = Math.sqrt(variance(arr)) || 1e-9;
+    const zs = arr.map(x => Math.abs((x - m) / sd));
+    return mean(zs);
+  };
+  
+  // -----------------------------
+  // STEP 1–4: parameter_score = absZMean * sqrt(stability)
+  // stability = 1 / variance
+  // -----------------------------
+  const parameterScores = paramArrays.map(arr => {
+    const varr = variance(arr);
+    const stability = 1 / (varr + 1e-9);
+    const absZ = absZScoreMean(arr);
+    return absZ * Math.sqrt(stability);
+  });
+  
+  // -----------------------------
+  // STEP 5: Min-Max normalize parameter scores
+  // -----------------------------
+  const minScore = Math.min(...parameterScores);
+  const maxScore = Math.max(...parameterScores);
+  const range = maxScore - minScore || 1e-9;
+  
+  const normalized = parameterScores.map(s => (s - minScore) / range);
+  
+  // -----------------------------
+  // STEP 6: Entropy Weighting
+  // -----------------------------
+  const sumNorm = normalized.reduce((a, b) => a + b, 0) || 1e-9;
+  
+  const p = normalized.map(v => v / sumNorm);
+  
+  const k = 1 / Math.log(5);
+  const entropy = -k * p.reduce((sum, pi) => {
+    return pi > 0 ? sum + pi * Math.log(pi) : sum;
+  }, 0);
+  
+  // all parameters share the same entropy when symmetric → equal weights
+  const weights = Array(5).fill(1 / 5);
+  
+  // -----------------------------
+  // STEP 7: Final KPI = weighted sum * 100
+  // -----------------------------
+  let KPI = 0;
+  for (let i = 0; i < 5; i++) {
+    KPI += weights[i] * normalized[i];
+  }
+  
+  return KPI * 100; // scale to 0–100
+}
+
+/**
  * Create or Update KPI
  * POST /api/kpis
  * 
@@ -82,6 +156,18 @@ export const createKpi = async (req, res, next) => {
       });
     }
 
+    // Calculate VASA KPI Score
+    let vasaScore = null;
+    try {
+      vasaScore = computeVASA(kpiData);
+    } catch (error) {
+      console.error('VASA computation error:', error);
+      return res.status(400).json({
+        error: 'Failed to compute KPI score',
+        message: 'Ensure kpiData has valid numeric arrays for all parameters'
+      });
+    }
+
     // Find existing KPI document for this user, period, and project
     let kpiDoc = await Kpi.findOne({
       user_id,
@@ -113,7 +199,8 @@ export const createKpi = async (req, res, next) => {
     res.status(201).json({
       message: 'KPI created/updated successfully',
       kpi: populatedKpi,
-      processedParameters: Object.keys(geminiResponse).length
+      vasaScore: parseFloat(vasaScore.toFixed(2)),
+      processedParameters: Object.keys(kpiData).length
     });
   } catch (error) {
     console.error('Create KPI error:', error);

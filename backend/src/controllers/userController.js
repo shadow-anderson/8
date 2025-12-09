@@ -99,6 +99,55 @@ export const login = async (req, res, next) => {
   }
 };
 
+/**
+ * Get user by email
+ * POST /api/users/get-by-email
+ * 
+ * req.body = {
+ *   email: string (required)
+ * }
+ */
+export const getUserByEmail = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    // Validate required field
+    if (!email) {
+      return res.status(400).json({ 
+        error: 'Missing required field', 
+        required: ['email'] 
+      });
+    }
+
+    // Find user by email (excluding password)
+    const user = await User.findOne({ email }).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ 
+        error: 'User not found' 
+      });
+    }
+
+    // If user has a team, fetch team info
+    let teamInfo = null;
+    if (user.team) {
+      teamInfo = await Team.findOne({ name: user.team })
+        .populate('leader_email', 'name email emp_code')
+        .populate('members', 'name email emp_code');
+    }
+
+    res.json({
+      message: 'User found',
+      user,
+      team: teamInfo
+    });
+
+  } catch (error) {
+    console.error('Error getting user by email:', error);
+    next(error);
+  }
+};
+
 // Get all users
 export const getAllUsers = async (req, res, next) => {
   try {
@@ -138,6 +187,7 @@ export const updateUser = async (req, res, next) => {
     next(error);
   }
 };
+
 
 // Delete user
 export const deleteUser = async (req, res, next) => {

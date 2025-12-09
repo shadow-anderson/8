@@ -1,6 +1,6 @@
 // User-related API endpoints
 import express from 'express';
-import { login, } from '../controllers/userController.js';
+import { login, getUserByEmail } from '../controllers/userController.js';
 // import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -12,6 +12,14 @@ const router = express.Router();
  * @body    { email, password }
  */
 router.post('/login', login);
+
+/**
+ * @route   POST /api/users/get-by-email
+ * @desc    Get user data by email
+ * @access  Public
+ * @body    { email }
+ */
+router.post('/get-by-email', getUserByEmail);
 
 // GET /api/users - Get all users
 // router.get('/', authenticate, userController.getAllUsers);
