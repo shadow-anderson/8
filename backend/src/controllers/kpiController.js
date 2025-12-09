@@ -15,14 +15,12 @@ import Project from '../models/Project.js';
  *   user_id: string (required) - User ID
  *   period: string (required) - "2025-12" format
  *   projectId: string (required) - Project ID
- *   pdfUrl: string (required) - PDF URL to process with Gemini
- * }
- * 
- * Gemini response format:
- * {
- *   "parameter1": [45, 46, 47, 44, 45],
- *   "parameter2": [78, 79, 77, 76, 75],
- *   ...
+ *   kpiData: object (required) - JSON object with KPI codes and values
+ *     Example: {
+ *       "parameter1": [75, 78, 76, 74, 77],
+ *       "parameter2": [15, 12, 10, 18, 13],
+ *       ...
+ *     }
  * }
  */
 export const createKpi = async (req, res, next) => {
@@ -31,14 +29,22 @@ export const createKpi = async (req, res, next) => {
       user_id,
       period,
       projectId,
-      pdfUrl
+      kpiData
     } = req.body;
 
     // Validate required fields
-    if (!user_id || !period || !projectId || !pdfUrl) {
+    if (!user_id || !period || !projectId || !kpiData) {
       return res.status(400).json({
         error: 'Missing required fields',
-        required: ['user_id', 'period', 'projectId', 'pdfUrl']
+        required: ['user_id', 'period', 'projectId', 'kpiData']
+      });
+    }
+
+    // Validate kpiData is an object
+    if (typeof kpiData !== 'object' || Array.isArray(kpiData)) {
+      return res.status(400).json({
+        error: 'Invalid kpiData format',
+        message: 'kpiData must be an object with parameter names as keys and arrays as values'
       });
     }
 
@@ -58,26 +64,21 @@ export const createKpi = async (req, res, next) => {
       });
     }
 
-    // TODO: Call Gemini API with pdfUrl
-    // For now, using placeholder - replace this with your Gemini API call
-    // const geminiResponse = await callGeminiAPI(pdfUrl);
-    
-    // Placeholder response (replace with actual Gemini call)
-    const geminiResponse = {
-      "parameter1": [45, 46, 47, 44, 45],
-      "parameter2": [78, 79, 77, 76, 75],
-      "parameter3": [18, 17, 19, 16, 20],
-      "parameter4": [98, 97, 99, 98, 96],
-      "parameter5": [65, 66, 67, 64, 68]
-    };
-
     // Store each parameter with its values array
     const kpisArray = [];
     
-    for (const [parameterName, values] of Object.entries(geminiResponse)) {
+    for (const [parameterName, values] of Object.entries(kpiData)) {
+      // Validate that values is an array
+      if (!Array.isArray(values)) {
+        return res.status(400).json({
+          error: `Invalid data for ${parameterName}`,
+          message: 'Each parameter must have an array of numeric values'
+        });
+      }
+
       kpisArray.push({
         kpi_code: parameterName,  // parameter1, parameter2, etc.
-        computedValues: values     // Store the entire array [45, 46, 47, 44, 45]
+        computedValues: values     // Store the entire array [75, 78, 76, 74, 77]
       });
     }
 
