@@ -1,8 +1,14 @@
+<<<<<<< Updated upstream
 /* #root {
   max-width: 1280px;
+=======
+#root {
+>>>>>>> Stashed changes
   margin: 0 auto;
+  /* max-width: 1280px;
+  
   padding: 2rem;
-  text-align: center;
+  text-align: center; */
 }
 
 .logo {
