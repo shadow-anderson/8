@@ -4,8 +4,8 @@
 
 /* Override body styling for full width */
 body:has(.manager-dashboard) {
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
   display: block; /* Override flex layout */
   place-items: initial;
   width: 100vw;
@@ -16,10 +16,16 @@ body:has(.manager-dashboard) {
   min-height: 100vh;
   width: 100vw; /* Full viewport width */
   background-color: #ffffff; /* Changed to white to remove black spaces */
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
   overflow-x: hidden; /* Prevent horizontal scrollbar */
   box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
 }
 
 /* Header - Full Width */
@@ -28,11 +34,13 @@ body:has(.manager-dashboard) {
   color: white;
   padding: 1.5rem 3rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  margin: 0;
+  margin: 0 !important;
   width: 100%;
   position: relative;
   overflow: hidden;
   border-bottom: 3px solid rgba(255, 255, 255, 0.1);
+  left: 0;
+  right: 0;
 }
 
 .dashboard-header::before {
@@ -230,8 +238,8 @@ body:has(.manager-dashboard) {
 .dashboard-main {
   width: 100%; /* Full width */
   max-width: 100%; /* Remove centering constraint */
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
   background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
 }
 

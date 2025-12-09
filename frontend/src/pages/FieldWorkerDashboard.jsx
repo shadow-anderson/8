@@ -45,18 +45,18 @@ export default function FieldWorkerDashboard() {
 
   // Navigation items
   const navItems = [
-    { id: 'productivity-strip', label: '📊 Productivity Strip', icon: '📊' },
-    { id: 'dpr-workspace', label: '📋 DPR Workspace', icon: '📋' },
-    { id: 'evidence-portal', label: '📸 Evidence Portal', icon: '📸' },
-    { id: 'task-board', label: '📊 Task Board', icon: '📊' },
-    { id: 'kpi-meter', label: '📈 KPI Meter', icon: '📈' },
-    { id: 'project-timeline', label: '🗓️ Project Timeline', icon: '🗓️' },
-    { id: 'comm-hub', label: '💬 Communication Hub', icon: '💬' },
-    { id: 'notifications', label: '🔔 Notifications', icon: '🔔' },
-    { id: 'ask-prabhav', label: '🤖 AI Assistant', icon: '🤖' },
-    { id: 'compliance-validator', label: '✅ Compliance', icon: '✅' },
-    { id: 'worker-analytics', label: '📊 Analytics', icon: '📊' },
-    { id: 'accountability-log', label: '📜 Accountability', icon: '📜' },
+    { id: 'productivity-strip', label: 'Productivity Strip', icon: 'chart-bar' },
+    { id: 'dpr-workspace', label: 'DPR Workspace', icon: 'clipboard' },
+    { id: 'evidence-portal', label: 'Evidence Portal', icon: 'camera' },
+    { id: 'task-board', label: 'Task Board', icon: 'tasks' },
+    { id: 'kpi-meter', label: 'KPI Meter', icon: 'chart-line' },
+    { id: 'project-timeline', label: 'Project Timeline', icon: 'calendar' },
+    { id: 'comm-hub', label: 'Communication Hub', icon: 'comments' },
+    { id: 'notifications', label: 'Notifications', icon: 'bell' },
+    { id: 'ask-prabhav', label: 'AI Assistant', icon: 'robot' },
+    { id: 'compliance-validator', label: 'Compliance', icon: 'check-circle' },
+    { id: 'worker-analytics', label: 'Analytics', icon: 'chart-pie' },
+    { id: 'accountability-log', label: 'Accountability', icon: 'history' },
   ];
 
   // Offline data sync function
@@ -78,7 +78,7 @@ export default function FieldWorkerDashboard() {
           </button>
           <div className="header-left">
             <div className="logo-section">
-              <div className="logo-icon">🏗️</div>
+              <div className="logo-icon">FW</div>
               <div className="header-title-group">
                 <h1>Field Worker Dashboard</h1>
                 <p className="header-subtitle">Real-time Task Management & Reporting</p>
@@ -99,18 +99,18 @@ export default function FieldWorkerDashboard() {
             </div>
             <div className="header-divider"></div>
             <button className="notification-btn" title="Notifications">
-              <span className="notification-icon">🔔</span>
+              <span className="notification-icon"></span>
               <span className="notification-badge">5</span>
             </button>
             <button onClick={handleLogout} className="logout-btn">
-              <span className="logout-icon">🚪</span>
+              <span className="logout-icon"></span>
               Logout
             </button>
           </div>
         </div>
         {!isOnline && (
           <div className="offline-banner">
-            <span className="offline-icon">⚠️</span>
+            <span className="offline-icon"></span>
             <span>You are offline — data will sync automatically when connection returns</span>
           </div>
         )}
@@ -121,7 +121,7 @@ export default function FieldWorkerDashboard() {
         <aside className={`sidebar-nav ${sidebarOpen ? 'open' : ''}`}>
           <div className="sidebar-header">
             <div className="sidebar-title">
-              <span className="sidebar-icon">🧭</span>
+              <span className="sidebar-icon"></span>
               <h3>Quick Navigation</h3>
             </div>
             <button className="close-btn" onClick={() => setSidebarOpen(false)}>×</button>
@@ -133,7 +133,7 @@ export default function FieldWorkerDashboard() {
                 className="nav-item"
                 onClick={() => scrollToSection(item.id)}
               >
-                <span className="nav-icon">{item.icon}</span>
+                <span className={`nav-icon icon-${item.icon}`}></span>
                 <span className="nav-label">{item.label}</span>
                 <span className="nav-arrow">›</span>
               </button>
@@ -365,7 +365,7 @@ function TasksSection() {
   if (loading) {
     return (
       <section className="tasks-section">
-        <h2>📋 My Tasks</h2>
+        <h2>My Tasks</h2>
         <p>Loading tasks...</p>
       </section>
     );
@@ -373,7 +373,7 @@ function TasksSection() {
 
   return (
     <section className="tasks-section">
-      <h2>📋 My Tasks</h2>
+      <h2>My Tasks</h2>
       <div className="tasks-table-container">
         <table className="tasks-table">
           <thead>
@@ -423,10 +423,10 @@ function TasksSection() {
                   <td className="task-assigned-date">{task.assignedDate}</td>
                   <td className="task-actions">
                     <button className="action-btn view-btn" title="View Details">
-                      👁️
+                      <span className="icon-eye"></span>
                     </button>
                     <button className="action-btn update-btn" title="Update Progress">
-                      ✏️
+                      <span className="icon-edit"></span>
                     </button>
                   </td>
                 </tr>
@@ -634,7 +634,7 @@ function DPRWorkspace({ isOnline }) {
 
   return (
     <section className="dpr-workspace">
-      <h2>📋 DPR Upload Workspace</h2>
+      <h2>DPR Upload Workspace</h2>
       
       {/* Task Selection */}
       {availableTasks.length > 0 && (
@@ -707,7 +707,7 @@ function DPRWorkspace({ isOnline }) {
                       {v.files.map((file, idx) => (
                         <li key={idx} className="file-item">
                           <div className="file-info">
-                            <span className="file-name">📄 {file.name}</span>
+                            <span className="file-name">{file.name}</span>
                             <span className="file-size">({(file.size / 1024).toFixed(2)} KB)</span>
                           </div>
                           <div className="file-actions">
@@ -717,7 +717,7 @@ function DPRWorkspace({ isOnline }) {
                               rel="noopener noreferrer"
                               className="file-link"
                             >
-                              🔗 View
+                              View
                             </a>
                             <button
                               onClick={() => {
@@ -726,7 +726,7 @@ function DPRWorkspace({ isOnline }) {
                               }}
                               className="copy-url-btn"
                             >
-                              📋 Copy URL
+                              Copy URL
                             </button>
                           </div>
                           <div className="file-url">
@@ -885,7 +885,7 @@ function EvidencePortal({ isOnline }) {
 
   return (
     <section className="evidence-portal">
-      <h2>📸 Evidence Capture Portal</h2>
+      <h2>Evidence Capture Portal</h2>
 
       <div className="evidence-upload">
         <input
@@ -933,7 +933,7 @@ function EvidencePortal({ isOnline }) {
                       rel="noopener noreferrer"
                       className="evidence-link"
                     >
-                      🔗 View File
+                      View File
                     </a>
                     <button
                       onClick={() => {
@@ -942,7 +942,7 @@ function EvidencePortal({ isOnline }) {
                       }}
                       className="copy-url-btn"
                     >
-                      📋 Copy URL
+                      Copy URL
                     </button>
                   </div>
                   <div className="evidence-url">
@@ -1026,7 +1026,7 @@ function TaskBoard() {
 
   return (
     <section className="task-board">
-      <h2>📊 Task Board</h2>
+      <h2>Task Board</h2>
       <div className="kanban-board">
         <div className="kanban-column">
           <h3>Pending</h3>
@@ -1078,7 +1078,7 @@ function KPIMeter() {
 
   return (
     <section className="kpi-meter">
-      <h2>📈 Personal KPI Meter</h2>
+      <h2>Personal KPI Meter</h2>
       <div className="kpi-score">
         <div className="score-circle">
           <span className="score">{kpi.score}</span>
@@ -1179,11 +1179,11 @@ function ProjectTimeline() {
 
   return (
     <section className="project-timeline">
-      <h2>🗓️ Project Timeline + Gantt</h2>
+      <h2>Project Timeline + Gantt</h2>
       {projects.map((project) => (
         <div key={project.id} className="project-item">
           <h3>
-            {project.name} {project.delayFlag && <span className="delay-flag">🚨 Delayed</span>}
+            {project.name} {project.delayFlag && <span className="delay-flag">Delayed</span>}
           </h3>
           <p>Project ID: {project.id}</p>
           <div className="milestones">
@@ -1256,7 +1256,7 @@ function CommHub() {
 
   return (
     <section className="comm-hub">
-      <h2>💬 Communication & Clarification Hub</h2>
+      <h2>Communication & Clarification Hub</h2>
       <div className="message-thread">
         {messages.map((msg) => (
           <div key={msg.id} className={`message ${msg.sender === 'You' ? 'own' : 'other'} ${msg.isAI ? 'ai' : ''}`}>
@@ -1302,7 +1302,7 @@ function Notifications() {
 
   return (
     <section className="notifications-center">
-      <h2>🔔 Notifications</h2>
+      <h2>Notifications</h2>
       <div className="notification-list">
         {notifications.length === 0 ? (
           <p>No notifications</p>
@@ -1356,7 +1356,7 @@ function AskPrabhav() {
 
   return (
     <section className="ask-prabhav">
-      <h2>🤖 Ask Prabhav (AI Assistant)</h2>
+      <h2>Ask Prabhav (AI Assistant)</h2>
       <div className="ai-interface">
         <input
           type="text"
@@ -1404,14 +1404,14 @@ function ComplianceValidator() {
 
   return (
     <section className="compliance-validator">
-      <h2>✅ Compliance Validator</h2>
+      <h2>Compliance Validator</h2>
       <button onClick={validateDPR} className="validate-btn">
         Run Compliance Check
       </button>
 
       {validationResults && (
         <div className={`validation-results ${validationResults.passed ? 'pass' : 'fail'}`}>
-          <h3>{validationResults.passed ? '✓ All checks passed!' : '⚠️ Issues found:'}</h3>
+          <h3>{validationResults.passed ? 'All checks passed!' : 'Issues found:'}</h3>
           {!validationResults.passed && (
             <>
               <ul className="issue-list">
@@ -1463,7 +1463,7 @@ function WorkerAnalytics() {
 
   return (
     <section className="worker-analytics">
-      <h2>📊 Worker Analytics Dashboard</h2>
+      <h2>Worker Analytics Dashboard</h2>
 
       <div className="analytics-grid">
         <div className="analytics-card">
@@ -1528,7 +1528,7 @@ function AccountabilityLog() {
 
   return (
     <section className="accountability-log">
-      <h2>📜 Accountability Log</h2>
+      <h2>Accountability Log</h2>
       <table className="log-table">
         <thead>
           <tr>
