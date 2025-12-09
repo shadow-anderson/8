@@ -2,12 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import './ManagerDashboard.css';
-const a = [];
-
-
 
 const ManagerDashboard = () => {
-  const { user, logout } = useAuth();
+  const { user, userProfile, logout } = useAuth();
   const navigate = useNavigate();
   const [showTaskMenu, setShowTaskMenu] = useState(false);
   const [showSubMenu, setShowSubMenu] = useState(null); // 'individual' or 'team'
@@ -269,11 +266,11 @@ const ManagerDashboard = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const [weight1] = 12;
-      const [weight2] = 30;
-      const [weight3] = 15;
-      const [weight4] = 20;
-      const [weight5] = 23;
+      // const [weight1] = 12;
+      // const [weight2] = 30;
+      // const [weight3] = 15;
+      // const [weight4] = 20;
+      // const [weight5] = 23;
       
 
       const data = await response.json();
@@ -293,10 +290,30 @@ const ManagerDashboard = () => {
       {/* Header */}
       <header className="dashboard-header">
         <div className="header-content">
-          <h1>Manager Dashboard</h1>
+          <div className="header-left">
+            <div className="logo-section">
+              <div className="logo-icon">📊</div>
+              <div className="header-title-group">
+                <h1>Manager Dashboard</h1>
+                <p className="header-subtitle">Project Management & Analytics</p>
+              </div>
+            </div>
+          </div>
           <div className="header-actions">
-            <span className="user-name">Welcome, {user?.username}</span>
+            <div className="user-info-header">
+              <div className="user-avatar">{(userProfile?.name || user?.username)?.charAt(0).toUpperCase()}</div>
+              <div className="user-details">
+                <span className="user-name">{userProfile?.name || user?.username}</span>
+                <span className="user-designation">{userProfile?.designation || user?.role || 'Manager'}</span>
+              </div>
+            </div>
+            <div className="header-divider"></div>
+            <button className="notification-btn" title="Notifications">
+              <span className="notification-icon">🔔</span>
+              <span className="notification-badge">3</span>
+            </button>
             <button onClick={handleLogout} className="logout-btn">
+              <span className="logout-icon">🚪</span>
               Logout
             </button>
           </div>
@@ -306,40 +323,23 @@ const ManagerDashboard = () => {
       {/* Main Content */}
       <main className="dashboard-main">
         {/* Stats Overview Cards */}
-        <div className="stats-container">
-          <div className="stat-card stat-card-blue">
-            <div className="stat-icon">📊</div>
-            <div className="stat-details">
-              <h3 className="stat-value">24</h3>
-              <p className="stat-label">Active Tasks</p>
-            </div>
-          </div>
-          <div className="stat-card stat-card-green">
-            <div className="stat-icon">✓</div>
-            <div className="stat-details">
-              <h3 className="stat-value">18</h3>
-              <p className="stat-label">Completed</p>
-            </div>
-          </div>
-          <div className="stat-card stat-card-orange">
-            <div className="stat-icon">⏱️</div>
-            <div className="stat-details">
-              <h3 className="stat-value">6</h3>
-              <p className="stat-label">Pending Review</p>
-            </div>
-          </div>
-          <div className="stat-card stat-card-purple">
-            <div className="stat-icon">👥</div>
-            <div className="stat-details">
-              <h3 className="stat-value">12</h3>
-              <p className="stat-label">Team Members</p>
-            </div>
-          </div>
-        </div>
+        
 
         {/* DPR Section */}
         <section className="dashboard-section">
-          <h2>📋 Detailed Project Report</h2>
+          <div className="section-header">
+            <div className="section-title-group">
+              <div className="section-icon">📋</div>
+              <div>
+                <h2>Detailed Project Reports</h2>
+                <p className="section-subtitle">Review and approve project submissions</p>
+              </div>
+            </div>
+            <div className="section-actions">
+              <button className="filter-btn">Filter <span>▼</span></button>
+              <button className="export-btn">📥 Export</button>
+            </div>
+          </div>
           <div className="section-content">
             <div className="dpr-grid">
               {evidenceData.evidences && evidenceData.evidences.length > 0 ? (
@@ -379,8 +379,16 @@ const ManagerDashboard = () => {
         </section>
 
         {/* KPI Calculation Section */}
-        <section className="dashboard-section">
-          <h2>📊 Key Performance Indicator Analysis</h2>
+        <section className="dashboard-section kpi-section">
+          <div className="section-header">
+            <div className="section-title-group">
+              <div className="section-icon">📊</div>
+              <div>
+                <h2>Key Performance Indicator Analysis</h2>
+                <p className="section-subtitle">AI-powered VASA performance evaluation</p>
+              </div>
+            </div>
+          </div>
           <div className="section-content">
             {!kpiResult ? (
               <div className="kpi-submit-container">
@@ -449,8 +457,14 @@ const ManagerDashboard = () => {
 
         {/* Task Section */}
         <section className="dashboard-section">
-          <div className="section-header-with-button">
-            <h2>✏️ Task Assignment</h2>
+          <div className="section-header">
+            <div className="section-title-group">
+              <div className="section-icon">✏️</div>
+              <div>
+                <h2>Task Assignment</h2>
+                <p className="section-subtitle">Create and assign tasks to team members</p>
+              </div>
+            </div>
             <div className="new-task-container">
               <button 
                 className="new-task-btn"

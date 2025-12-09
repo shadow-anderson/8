@@ -76,17 +76,42 @@ export default function FieldWorkerDashboard() {
           <button className="hamburger-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
             ☰
           </button>
-          <h1>Field Worker Dashboard</h1>
+          <div className="header-left">
+            <div className="logo-section">
+              <div className="logo-icon">🏗️</div>
+              <div className="header-title-group">
+                <h1>Field Worker Dashboard</h1>
+                <p className="header-subtitle">Real-time Task Management & Reporting</p>
+              </div>
+            </div>
+          </div>
           <div className="header-actions">
-            <span className="user-name">Welcome, {user?.username}</span>
+            <div className="connection-status">
+              <span className={`status-indicator ${isOnline ? 'online' : 'offline'}`}></span>
+              <span className="status-text">{isOnline ? 'Online' : 'Offline'}</span>
+            </div>
+            <div className="user-info-header">
+              <div className="user-avatar">{user?.username?.charAt(0).toUpperCase()}</div>
+              <div className="user-details">
+                <span className="user-name">{user?.username}</span>
+                <span className="user-role">Field Worker</span>
+              </div>
+            </div>
+            <div className="header-divider"></div>
+            <button className="notification-btn" title="Notifications">
+              <span className="notification-icon">🔔</span>
+              <span className="notification-badge">5</span>
+            </button>
             <button onClick={handleLogout} className="logout-btn">
+              <span className="logout-icon">🚪</span>
               Logout
             </button>
           </div>
         </div>
         {!isOnline && (
           <div className="offline-banner">
-            ⚠️ You are offline — data will sync automatically when connection returns
+            <span className="offline-icon">⚠️</span>
+            <span>You are offline — data will sync automatically when connection returns</span>
           </div>
         )}
       </header>
@@ -95,7 +120,10 @@ export default function FieldWorkerDashboard() {
         {/* Sidebar Navigation */}
         <aside className={`sidebar-nav ${sidebarOpen ? 'open' : ''}`}>
           <div className="sidebar-header">
-            <h3>Navigation</h3>
+            <div className="sidebar-title">
+              <span className="sidebar-icon">🧭</span>
+              <h3>Quick Navigation</h3>
+            </div>
             <button className="close-btn" onClick={() => setSidebarOpen(false)}>×</button>
           </div>
           <nav className="nav-menu">
@@ -107,6 +135,7 @@ export default function FieldWorkerDashboard() {
               >
                 <span className="nav-icon">{item.icon}</span>
                 <span className="nav-label">{item.label}</span>
+                <span className="nav-arrow">›</span>
               </button>
             ))}
           </nav>

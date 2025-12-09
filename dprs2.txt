@@ -1,0 +1,22 @@
+[
+  "https://mpa.gov.in/sites/default/files/Model_DPR_Final%202.0.pdf",
+  "https://nhb.gov.in/NHBDPR/Fig_DPR.pdf",
+  "https://ditmeghalaya.gov.in/pdf/DPR_VOL_II_26_10_2022.pdf",
+  "https://drdo.gov.in/drdo/sites/default/files/inline-files/4_DPR_A_Doc4_14102024.pdf",
+  "https://www.dcmsme.gov.in/tcsp/ntc/dpr/Bhopal%20DPR.pdf",
+  "https://www.hcisingapore.gov.in/pdf/DPR_Format.pdf",
+  "https://cdnbbsr.s3waas.gov.in/s3bb1662b7c5f22a0f905fd59e718ca05e/uploads/2022/06/2022060112.pdf",
+  "https://mmrda.maharashtra.gov.in/sites/default/files/2021-10/Metro%20Line%2011.pdf",
+  "https://nhb.gov.in/NHBDPR/Peach_DPR.pdf",
+  "https://nhb.gov.in/NHBDPR/Anthurium_DPR.pdf",
+  "https://nhb.gov.in/NHBDPR/Carnation_DPR.pdf",
+  "https://nhb.gov.in/NHBDPR/Tomato_DPR.pdf",
+  "https://drdo.gov.in/drdo/sites/default/files/inline-files/DPR_A_Doc5.pdf",
+  "https://localbodies.up.nic.in/Toolkit/DPR.pdf",
+  "https://mohua.gov.in/upload/uploadfiles/files/12DPRpreparationmodule.pdf",
+  "https://www.mohua.gov.in/upload/uploadfiles/files/MRTS_DPR_I_guidelines_final.pdf",
+  "https://agriinfra.dac.gov.in/Home/ModelDPR",
+  "https://impactkerala.lsgkerala.gov.in/sites/default/files/2021-08/GeneralDPRTemplate.pdf",
+  "https://www.celsgd.kerala.gov.in/celsgd/pdf/BuildingsDPRTemplate.pdf",
+  "https://mpa.gov.in/sites/default/files/Model_DPR_Final%202.0.pdf"
+]
