@@ -1,4 +1,34 @@
 * {
+/* <<<<<<< HEAD */
+/* ============================================================================
+   FIELD WORKER DASHBOARD STYLES
+   ============================================================================ */
+
+.field-worker-dashboard {
+  min-height: 100vh;
+  background-color: #f5f7fa;
+}
+
+/* Header */
+.dashboard-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header-content h1 {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -695,7 +725,7 @@ body {
 .hq-task-title {
   font-weight: 500;
   color: #2d2420;
-  width: ;
+  width: 100%;
 }
 
 .hq-priority-badge {
@@ -842,6 +872,15 @@ body {
   }
 
   .kanban-board {
+    grid-template-columns: 1fr;
+  }
+}
+
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kpi-breakdown {
     grid-template-columns: 1fr;
   }
 }
