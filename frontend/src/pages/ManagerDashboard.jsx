@@ -17,6 +17,35 @@ const ManagerDashboard = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [evidenceData, setEvidenceData] = useState([]);
+  const [kpiInputs, setKpiInputs] = useState({
+    dprTimeliness: '',
+    dprQuality: '',
+    surveyAccuracy: '',
+    milestoneHitRate: '',
+    physicalProgress: '',
+    budgetVariance: '',
+    qcPassRate: '',
+    fieldEvidenceCompleteness: ''
+  });
+
+  useEffect(() => {
+    const fetchManagerEvidence = async () => {
+      const managerId = '6936b237e32c05c1be088e40';
+      
+      try {
+        const response = await fetch(`https://eight-csdo.onrender.com/api/evidence/manager/${managerId}`);
+        const data = await response.json();
+        console.log('Manager evidence data:', data);
+        setEvidenceData(data);
+      } catch (error) {
+        console.error('Error fetching manager evidence:', error);
+        setEvidenceData([]);
+      }
+    };
+
+    fetchManagerEvidence();
+  }, []);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -112,7 +141,8 @@ const ManagerDashboard = () => {
           name: taskData.title,
           description: taskData.description,
           planned_end: '2',
-          project_type:'single'
+          project_type:'single',
+          givenBy: '6936b237e32c05c1be088e40'
         })
       });
       
@@ -147,6 +177,38 @@ const ManagerDashboard = () => {
       title: '',
       description: ''
     });
+  };
+
+  const handleKpiInputChange = (e) => {
+    const { name, value } = e.target;
+    // Only allow numeric values between 0-100
+    if (value === '' || (/^\d+$/.test(value) && parseInt(value) >= 0 && parseInt(value) <= 100)) {
+      setKpiInputs(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
+
+  const handleCalculateKPI = () => {
+    // Check if all fields are filled
+    const allFilled = Object.values(kpiInputs).every(value => value !== '');
+    
+    if (!allFilled) {
+      alert('Please fill in all KPI fields');
+      return;
+    }
+
+    // Calculate average or process KPI
+    const values = Object.values(kpiInputs).map(v => parseInt(v));
+    const average = values.reduce((sum, val) => sum + val, 0) / values.length;
+    
+    console.log('KPI Values:', kpiInputs);
+    console.log('Average KPI Score:', average.toFixed(2));
+    
+    alert(`KPI Calculated!\nAverage Score: ${average.toFixed(2)}`);
+    
+    // TODO: Send to backend or process further
   };
 
   return (
@@ -203,43 +265,175 @@ const ManagerDashboard = () => {
           <h2>📋 Detailed Project Report</h2>
           <div className="section-content">
             <div className="dpr-grid">
-              <div className="dpr-card">
-                <div className="dpr-card-header">
-                  <span className="dpr-status dpr-status-pending">Pending Review</span>
-                  <span className="dpr-date">Dec 8, 2025</span>
-                </div>
-                <h4 className="dpr-title">Site Survey - Block A</h4>
-                <p className="dpr-submitter">Submitted by: <strong>field1</strong></p>
-                <div className="dpr-card-footer">
-                  <button className="dpr-action-btn dpr-view-btn">View Details</button>
-                  <button className="dpr-action-btn dpr-approve-btn">Approve</button>
-                </div>
+              {evidenceData.evidences && evidenceData.evidences.length > 0 ? (
+                evidenceData.evidences.map((evidence) => (
+                  <div key={evidence._id} className="dpr-card">
+                    <div className="dpr-card-header">
+                      <span className="dpr-status dpr-status-pending">Pending Review</span>
+                      <span className="dpr-date">
+                        {new Date(evidence.uploaded_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                    <h4 className="dpr-title">{evidence.project_id?.name || 'Untitled Project'}</h4>
+                    <p className="dpr-description">{evidence.project_id?.description || 'No description'}</p>
+                    <p className="dpr-submitter">
+                      Submitted by: <strong>{evidence.uploaded_by?.name || 'Unknown'}</strong>
+                    </p>
+                    <div className="dpr-card-footer">
+                      <button 
+                        className="dpr-action-btn dpr-view-btn"
+                        onClick={() => window.open(evidence.file_url, '_blank')}
+                      >
+                        View Details
+                      </button>
+                      <button className="dpr-action-btn dpr-approve-btn">Approve</button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>No DPR submissions yet</p>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* KPI Input Section */}
+        <section className="dashboard-section">
+          <h2>📊 KPI Component Scores</h2>
+          <div className="section-content">
+            <div className="kpi-inputs-grid">
+              <div className="kpi-input-group">
+                <label htmlFor="dprTimeliness">DPR Timeliness Score</label>
+                <input
+                  type="number"
+                  id="dprTimeliness"
+                  name="dprTimeliness"
+                  className="kpi-input"
+                  placeholder="0-100"
+                  min="0"
+                  max="100"
+                  value={kpiInputs.dprTimeliness}
+                  onChange={handleKpiInputChange}
+                />
               </div>
 
-              <div className="dpr-card">
-                <div className="dpr-card-header">
-                  <span className="dpr-status dpr-status-approved">Approved</span>
-                  <span className="dpr-date">Dec 7, 2025</span>
-                </div>
-                <h4 className="dpr-title">Foundation Work - Block B</h4>
-                <p className="dpr-submitter">Submitted by: <strong>field2</strong></p>
-                <div className="dpr-card-footer">
-                  <button className="dpr-action-btn dpr-view-btn">View Details</button>
-                </div>
+              <div className="kpi-input-group">
+                <label htmlFor="dprQuality">DPR Quality Score</label>
+                <input
+                  type="number"
+                  id="dprQuality"
+                  name="dprQuality"
+                  className="kpi-input"
+                  placeholder="0-100"
+                  min="0"
+                  max="100"
+                  value={kpiInputs.dprQuality}
+                  onChange={handleKpiInputChange}
+                />
               </div>
 
-              <div className="dpr-card">
-                <div className="dpr-card-header">
-                  <span className="dpr-status dpr-status-pending">Pending Review</span>
-                  <span className="dpr-date">Dec 8, 2025</span>
-                </div>
-                <h4 className="dpr-title">Quality Inspection Report</h4>
-                <p className="dpr-submitter">Submitted by: <strong>field1</strong></p>
-                <div className="dpr-card-footer">
-                  <button className="dpr-action-btn dpr-view-btn">View Details</button>
-                  <button className="dpr-action-btn dpr-approve-btn">Approve</button>
-                </div>
+              <div className="kpi-input-group">
+                <label htmlFor="surveyAccuracy">Survey Accuracy Score</label>
+                <input
+                  type="number"
+                  id="surveyAccuracy"
+                  name="surveyAccuracy"
+                  className="kpi-input"
+                  placeholder="0-100"
+                  min="0"
+                  max="100"
+                  value={kpiInputs.surveyAccuracy}
+                  onChange={handleKpiInputChange}
+                />
               </div>
+
+              <div className="kpi-input-group">
+                <label htmlFor="milestoneHitRate">Milestone Hit Rate</label>
+                <input
+                  type="number"
+                  id="milestoneHitRate"
+                  name="milestoneHitRate"
+                  className="kpi-input"
+                  placeholder="0-100"
+                  min="0"
+                  max="100"
+                  value={kpiInputs.milestoneHitRate}
+                  onChange={handleKpiInputChange}
+                />
+              </div>
+
+              <div className="kpi-input-group">
+                <label htmlFor="physicalProgress">Physical Progress Index</label>
+                <input
+                  type="number"
+                  id="physicalProgress"
+                  name="physicalProgress"
+                  className="kpi-input"
+                  placeholder="0-100"
+                  min="0"
+                  max="100"
+                  value={kpiInputs.physicalProgress}
+                  onChange={handleKpiInputChange}
+                />
+              </div>
+
+              <div className="kpi-input-group">
+                <label htmlFor="budgetVariance">Budget Variance Score</label>
+                <input
+                  type="number"
+                  id="budgetVariance"
+                  name="budgetVariance"
+                  className="kpi-input"
+                  placeholder="0-100"
+                  min="0"
+                  max="100"
+                  value={kpiInputs.budgetVariance}
+                  onChange={handleKpiInputChange}
+                />
+              </div>
+
+              <div className="kpi-input-group">
+                <label htmlFor="qcPassRate">QC Pass Rate</label>
+                <input
+                  type="number"
+                  id="qcPassRate"
+                  name="qcPassRate"
+                  className="kpi-input"
+                  placeholder="0-100"
+                  min="0"
+                  max="100"
+                  value={kpiInputs.qcPassRate}
+                  onChange={handleKpiInputChange}
+                />
+              </div>
+
+              <div className="kpi-input-group">
+                <label htmlFor="fieldEvidenceCompleteness">Field Evidence Completeness</label>
+                <input
+                  type="number"
+                  id="fieldEvidenceCompleteness"
+                  name="fieldEvidenceCompleteness"
+                  className="kpi-input"
+                  placeholder="0-100"
+                  min="0"
+                  max="100"
+                  value={kpiInputs.fieldEvidenceCompleteness}
+                  onChange={handleKpiInputChange}
+                />
+              </div>
+            </div>
+
+            <div className="kpi-submit-container">
+              <button 
+                className="kpi-submit-btn"
+                onClick={handleCalculateKPI}
+              >
+                Calculate KPI
+              </button>
             </div>
           </div>
         </section>

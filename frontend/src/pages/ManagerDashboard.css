@@ -737,3 +737,139 @@ body:has(.manager-dashboard) {
     width: 100%;
   }
 }
+
+/* ============================================================================
+   KPI INPUT SECTION STYLES
+   ============================================================================ */
+
+.kpi-inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.kpi-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.kpi-input-group label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  display: block;
+  letter-spacing: 0.3px;
+  margin-bottom: 0.25rem;
+}
+
+.kpi-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #1f2937;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.kpi-input::placeholder {
+  color: #9ca3af;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.kpi-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  background: #f9fafb;
+}
+
+.kpi-input:hover {
+  border-color: #d1d5db;
+}
+
+/* Remove spinner arrows for number inputs */
+.kpi-input::-webkit-outer-spin-button,
+.kpi-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.kpi-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.kpi-submit-container {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.kpi-submit-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  padding: 1.125rem 3rem;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.kpi-submit-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+.kpi-submit-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive KPI styles */
+@media (max-width: 768px) {
+  .kpi-inputs-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  .kpi-input {
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+  }
+
+  .kpi-submit-btn {
+    width: 100%;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .kpi-inputs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1025px) {
+  .kpi-inputs-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

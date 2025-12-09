@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { uploadToCloudinary, uploadMultipleToCloudinary } from '../config/cloudinary.service';
+import { uploadToUploadcare, uploadMultipleToUploadcare } from '../config/uploadcare.service';
 import './FieldWorkerDashboard.css';
 
 // ============================================================================
@@ -498,7 +498,7 @@ function DPRWorkspace({ isOnline }) {
   }
 
   async function uploadDPR(fileList) {
-    console.log('Uploading DPR files to Cloudinary:', fileList);
+    console.log('Uploading DPR files to Uploadcare:', fileList);
     
     if (!isOnline) {
       // Store in localStorage for offline mode
@@ -510,18 +510,15 @@ function DPRWorkspace({ isOnline }) {
     }
 
     try {
-      // Upload files to Cloudinary
+      // Upload files to Uploadcare
       setStatus('Uploading...');
-      const uploadResults = await uploadMultipleToCloudinary(
+      const uploadResults = await uploadMultipleToUploadcare(
         fileList,
         'dpr',
         {
-          tags: ['dpr', 'field-worker', user?.username],
-          context: {
-            alt: 'DPR Document',
-            uploadedBy: user?.username,
-            uploadDate: new Date().toISOString(),
-          },
+          uploadedBy: user?.username,
+          uploadDate: new Date().toISOString(),
+          documentType: 'DPR',
         }
       );
 
@@ -537,7 +534,7 @@ function DPRWorkspace({ isOnline }) {
       if (successfulUploads.length > 0) {
         // Send each uploaded file to backend
         const backendPromises = successfulUploads.map(result => 
-          sendEvidenceToBackend(result.url, result.originalFilename)
+          sendEvidenceToBackend(result.urlWithFilename, result.originalFilename)
         );
         
         const backendResults = await Promise.all(backendPromises);
@@ -545,7 +542,7 @@ function DPRWorkspace({ isOnline }) {
         
         console.log(`✅ ${successfulBackendUploads}/${successfulUploads.length} files saved to backend`);
 
-        // Create new version with Cloudinary URLs
+        // Create new version with Uploadcare URLs
         const newVersion = {
           id: versions.length + 1,
           name: `V${versions.length + 1}`,
@@ -553,7 +550,7 @@ function DPRWorkspace({ isOnline }) {
           files: successfulUploads.map(result => ({
             name: result.originalFilename,
             url: result.url,
-            publicId: result.publicId,
+            uuid: result.uuid,
             size: result.size,
           })),
         };
@@ -566,10 +563,10 @@ function DPRWorkspace({ isOnline }) {
         successfulUploads.forEach((result, idx) => {
           console.log(`${idx + 1}. ${result.originalFilename}`);
           console.log(`   URL: ${result.url}`);
-          console.log(`   Public ID: ${result.publicId}`);
+          console.log(`   UUID: ${result.uuid}`);
         });
         
-        alert(`Successfully uploaded ${successfulUploads.length} file(s) to Cloudinary and saved ${successfulBackendUploads} to backend!\nCheck console for details.`);
+        alert(`Successfully uploaded ${successfulUploads.length} file(s) to Uploadcare and saved ${successfulBackendUploads} to backend!\nCheck console for details.`);
       }
     } catch (error) {
       console.error('DPR upload error:', error);
@@ -749,7 +746,7 @@ function EvidencePortal({ isOnline }) {
   }, []);
 
   async function uploadEvidence(file, metadata) {
-    console.log('Uploading evidence to Cloudinary:', file, metadata);
+    console.log('Uploading evidence to Uploadcare:', file, metadata);
 
     if (!isOnline) {
       const drafts = JSON.parse(localStorage.getItem('offlineDrafts') || '[]');
@@ -760,29 +757,27 @@ function EvidencePortal({ isOnline }) {
     }
 
     try {
-      // Upload to Cloudinary
-      const uploadResult = await uploadToCloudinary(
+      // Upload to Uploadcare
+      console.log("About to call 'uploadToUploadcare'");
+      const uploadResult = await uploadToUploadcare(
         file,
         'evidence',
         {
-          tags: ['evidence', 'field-worker', metadata.taskId],
-          context: {
-            alt: 'Field Evidence',
-            uploadedBy: user?.username,
-            gps: metadata.gps,
-            device: metadata.device,
-            taskId: metadata.taskId,
-          },
+          uploadedBy: user?.username,
+          gps: metadata.gps,
+          device: metadata.device,
+          taskId: metadata.taskId,
+          evidenceType: 'Field Evidence',
         }
       );
 
       if (uploadResult.success) {
-        // Add evidence with Cloudinary URL
+        // Add evidence with Uploadcare URL
         const newEvidence = {
           id: evidence.length + 1,
           name: file.name,
           url: uploadResult.url,
-          publicId: uploadResult.publicId,
+          uuid: uploadResult.uuid,
           ...metadata,
           aiFlag: Math.random() > 0.8, // Random AI flag (implement actual AI check)
         };
@@ -794,9 +789,9 @@ function EvidencePortal({ isOnline }) {
         console.log('✅ Evidence uploaded successfully!');
         console.log(`   File: ${file.name}`);
         console.log(`   Public URL: ${uploadResult.url}`);
-        console.log(`   Public ID: ${uploadResult.publicId}`);
+        console.log(`   UUID: ${uploadResult.uuid}`);
         
-        alert('Evidence uploaded successfully to Cloudinary!\nCheck console for public URL.');
+        alert('Evidence uploaded successfully to Uploadcare!\nCheck console for public URL.');
       } else {
         throw new Error(uploadResult.error);
       }
