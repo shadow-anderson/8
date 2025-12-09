@@ -1,17 +1,12 @@
 import { useState } from "react";
 
-<<<<<<< HEAD
 import { geminiModel } from "../lib/gemini";
 
 export default function AskPrabhav() {
-=======
-export default function ChatBot() {
->>>>>>> c05bf24 (DPR template and Gemini)
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 
-<<<<<<< HEAD
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -40,29 +35,6 @@ export default function ChatBot() {
       setMessages((prev) => [...prev, botMsg]);
       console.error("Gemini error:", err);
     }
-=======
-  const sendMessage = () => {
-    if (!input.trim()) return;
-
-    const userMsg = { sender: "user", text: input };
-    setMessages((prev) => [...prev, userMsg]);
-
-    // SIMPLE WEBSITE-SCOPED BOT LOGIC
-    let reply = "I can answer site-related questions only.";
-
-    if (input.toLowerCase().includes("contact")) {
-      reply = "You can reach support at support@example.com";
-    } else if (input.toLowerCase().includes("about")) {
-      reply = "This website provides XYZ services.";
-    } else if (input.toLowerCase().includes("help")) {
-      reply = "Sure! What do you need help with?";
-    }
-
-    const botMsg = { sender: "bot", text: reply };
-    setMessages((prev) => [...prev, botMsg]);
-
-    setInput("");
->>>>>>> c05bf24 (DPR template and Gemini)
   };
 
   return (
@@ -117,11 +89,7 @@ export default function ChatBot() {
               justifyContent: "space-between",
             }}
           >
-<<<<<<< HEAD
             <span>AskPrabhav</span>
-=======
-            <span>Chatbot</span>
->>>>>>> c05bf24 (DPR template and Gemini)
             <button
               onClick={() => setOpen(false)}
               style={{ background: "transparent", border: "none", color: "white" }}
@@ -192,7 +160,6 @@ export default function ChatBot() {
     </div>
   );
 }
-<<<<<<< HEAD
 
 async function fetchUserContext(email) {
   const res = await fetch(
@@ -234,5 +201,3 @@ Team context:
 ` : ""}
 `;
 }
-=======
->>>>>>> c05bf24 (DPR template and Gemini)
