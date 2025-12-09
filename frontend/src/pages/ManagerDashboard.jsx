@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import './ManagerDashboard.css';
+const a = [];
+
+
 
 const ManagerDashboard = () => {
   const { user, logout } = useAuth();
@@ -18,16 +21,9 @@ const ManagerDashboard = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [evidenceData, setEvidenceData] = useState([]);
-  const [kpiInputs, setKpiInputs] = useState({
-    dprTimeliness: '',
-    dprQuality: '',
-    surveyAccuracy: '',
-    milestoneHitRate: '',
-    physicalProgress: '',
-    budgetVariance: '',
-    qcPassRate: '',
-    fieldEvidenceCompleteness: ''
-  });
+  const [dprEvaluationData, setDprEvaluationData] = useState(null);
+  const [kpiResult, setKpiResult] = useState(null);
+  const [isAnalyzingDpr, setIsAnalyzingDpr] = useState(false);
 
   useEffect(() => {
     const fetchManagerEvidence = async () => {
@@ -179,36 +175,117 @@ const ManagerDashboard = () => {
     });
   };
 
-  const handleKpiInputChange = (e) => {
-    const { name, value } = e.target;
-    // Only allow numeric values between 0-100
-    if (value === '' || (/^\d+$/.test(value) && parseInt(value) >= 0 && parseInt(value) <= 100)) {
-      setKpiInputs(prev => ({
-        ...prev,
-        [name]: value
-      }));
+  const computeVASA = (params) => {
+    // params = { p1: [...5 numbers], p2: [...], ..., p5: [...] }
+    const paramArrays = Object.values(params);
+
+    // Helper Functions
+    const mean = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+
+    const variance = arr => {
+        const m = mean(arr);
+        return mean(arr.map(x => (x - m) ** 2));
+    };
+
+    // absolute z-score mean
+    const absZScoreMean = arr => {
+        const m = mean(arr);
+        const sd = Math.sqrt(variance(arr)) || 1e-9;
+        const zs = arr.map(x => Math.abs((x - m) / sd));
+        return mean(zs);
+    };
+
+    // STEP 1–4: parameter_score = absZMean * sqrt(stability)
+    // stability = 1 / variance
+    const parameterScores = paramArrays.map(arr => {
+        const varr = variance(arr);
+        const stability = 1 / (varr + 1e-9);
+        const absZ = absZScoreMean(arr);
+        return absZ * Math.sqrt(stability);
+    });
+
+    // STEP 5: Min-Max normalize parameter scores
+    const minScore = Math.min(...parameterScores);
+    const maxScore = Math.max(...parameterScores);
+    const range = maxScore - minScore || 1e-9;
+
+    const normalized = parameterScores.map(s => (s - minScore) / range);
+
+    // STEP 6: Entropy Weighting
+    const sumNorm = normalized.reduce((a, b) => a + b, 0) || 1e-9;
+
+    const p = normalized.map(v => v / sumNorm);
+
+    const k = 1 / Math.log(5);
+    const entropy = -k * p.reduce((sum, pi) => {
+        return pi > 0 ? sum + pi * Math.log(pi) : sum;
+    }, 0);
+
+    // all parameters share the same entropy when symmetric → equal weights
+    const weights = Array(5).fill(1 / 5);
+
+    // STEP 7: Final KPI = weighted sum * 100
+    let KPI = 0;
+    for (let i = 0; i < 5; i++) {
+        KPI += weights[i] * normalized[i];
     }
+
+    return KPI * 100; // scale to 0–100
   };
 
   const handleCalculateKPI = () => {
-    // Check if all fields are filled
-    const allFilled = Object.values(kpiInputs).every(value => value !== '');
-    
-    if (!allFilled) {
-      alert('Please fill in all KPI fields');
+    if (!dprEvaluationData) {
+      alert('No DPR evaluation data available. Please analyze DPR first.');
       return;
     }
 
-    // Calculate average or process KPI
-    const values = Object.values(kpiInputs).map(v => parseInt(v));
-    const average = values.reduce((sum, val) => sum + val, 0) / values.length;
-    
-    console.log('KPI Values:', kpiInputs);
-    console.log('Average KPI Score:', average.toFixed(2));
-    
-    alert(`KPI Calculated!\nAverage Score: ${average.toFixed(2)}`);
-    
-    // TODO: Send to backend or process further
+    try {
+      const result = computeVASA(dprEvaluationData);
+      setKpiResult(result);
+      console.log('Calculated KPI:', result);
+    } catch (error) {
+      console.error('Error calculating KPI:', error);
+      alert('Error calculating KPI. Please check the data.');
+    }
+  };
+
+  const handleAnalyzeDpr = async () => {
+    setIsAnalyzingDpr(true);
+    setDprEvaluationData(null);
+    setKpiResult(null);
+
+    try {
+      const response = await fetch('https://gemini-flash-api-sqag.onrender.com/evaluate-dpr', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fileUrl: 'https://niftem-t.ac.in/pmfme/dpr-tpowder.pdf'
+        })
+      });
+
+      if (!response.ok) {                             
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const [weight1] = 12;
+      const [weight2] = 30;
+      const [weight3] = 15;
+      const [weight4] = 20;
+      const [weight5] = 23;
+      
+
+      const data = await response.json();
+      console.log('DPR Evaluation Response:', data);
+      setDprEvaluationData(data);
+      alert('DPR Analysis completed successfully!');
+    } catch (error) {
+      console.error('Error evaluating DPR:', error);
+      alert('Error analyzing DPR. Please try again.');
+    } finally {
+      setIsAnalyzingDpr(false);
+    }
   };
 
   return (
@@ -301,140 +378,72 @@ const ManagerDashboard = () => {
           </div>
         </section>
 
-        {/* KPI Input Section */}
+        {/* KPI Calculation Section */}
         <section className="dashboard-section">
-          <h2>📊 KPI Component Scores</h2>
+          <h2>📊 Key Performance Indicator Analysis</h2>
           <div className="section-content">
-            <div className="kpi-inputs-grid">
-              <div className="kpi-input-group">
-                <label htmlFor="dprTimeliness">DPR Timeliness Score</label>
-                <input
-                  type="number"
-                  id="dprTimeliness"
-                  name="dprTimeliness"
-                  className="kpi-input"
-                  placeholder="0-100"
-                  min="0"
-                  max="100"
-                  value={kpiInputs.dprTimeliness}
-                  onChange={handleKpiInputChange}
-                />
+            {!kpiResult ? (
+              <div className="kpi-submit-container">
+                <button 
+                  className="analyze-dpr-btn"
+                  onClick={handleAnalyzeDpr}
+                  disabled={isAnalyzingDpr}
+                >
+                  {isAnalyzingDpr ? '⏳ Analyzing DPR...' : '🔍 Analyze DPR'}
+                </button>
+                <button 
+                  className="kpi-submit-btn"
+                  onClick={handleCalculateKPI}
+                  disabled={!dprEvaluationData}
+                >
+                  {dprEvaluationData ? 'Calculate KPI Score' : 'Calculate KPI Score'}
+                </button>
+                {isAnalyzingDpr && (
+                  <p className="kpi-loading">⏳ Analyzing DPR data, please wait...</p>
+                )}
               </div>
-
-              <div className="kpi-input-group">
-                <label htmlFor="dprQuality">DPR Quality Score</label>
-                <input
-                  type="number"
-                  id="dprQuality"
-                  name="dprQuality"
-                  className="kpi-input"
-                  placeholder="0-100"
-                  min="0"
-                  max="100"
-                  value={kpiInputs.dprQuality}
-                  onChange={handleKpiInputChange}
-                />
+            ) : (
+              <div className="kpi-result-container">
+                <div className="kpi-result-card">
+                  <div className="kpi-result-header">
+                    <h3>VASA Performance Score</h3>
+                    <span className="kpi-badge">Calculated</span>
+                  </div>
+                  <div className="kpi-result-body">
+                    <div className="kpi-score-display">
+                      <span className="kpi-score-value">{kpiResult.toFixed(2)}</span>
+                      <span className="kpi-score-label">/ 100</span>
+                    </div>
+                    <div className="kpi-performance-bar">
+                      <div 
+                        className="kpi-performance-fill" 
+                        style={{ width: `${Math.min(kpiResult, 100)}%` }}
+                      ></div>
+                    </div>
+                    <div className="kpi-rating">
+                      <span className="kpi-rating-label">Performance Rating:</span>
+                      <span className={`kpi-rating-value ${
+                        kpiResult >= 80 ? 'excellent' : 
+                        kpiResult >= 60 ? 'good' : 
+                        kpiResult >= 40 ? 'average' : 'needs-improvement'
+                      }`}>
+                        {kpiResult >= 80 ? '⭐ Excellent' : 
+                         kpiResult >= 60 ? '✓ Good' : 
+                         kpiResult >= 40 ? '◐ Average' : '⚠ Needs Improvement'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="kpi-result-footer">
+                    <button 
+                      className="kpi-recalculate-btn"
+                      onClick={handleCalculateKPI}
+                    >
+                      Recalculate
+                    </button>
+                  </div>
+                </div>
               </div>
-
-              <div className="kpi-input-group">
-                <label htmlFor="surveyAccuracy">Survey Accuracy Score</label>
-                <input
-                  type="number"
-                  id="surveyAccuracy"
-                  name="surveyAccuracy"
-                  className="kpi-input"
-                  placeholder="0-100"
-                  min="0"
-                  max="100"
-                  value={kpiInputs.surveyAccuracy}
-                  onChange={handleKpiInputChange}
-                />
-              </div>
-
-              <div className="kpi-input-group">
-                <label htmlFor="milestoneHitRate">Milestone Hit Rate</label>
-                <input
-                  type="number"
-                  id="milestoneHitRate"
-                  name="milestoneHitRate"
-                  className="kpi-input"
-                  placeholder="0-100"
-                  min="0"
-                  max="100"
-                  value={kpiInputs.milestoneHitRate}
-                  onChange={handleKpiInputChange}
-                />
-              </div>
-
-              <div className="kpi-input-group">
-                <label htmlFor="physicalProgress">Physical Progress Index</label>
-                <input
-                  type="number"
-                  id="physicalProgress"
-                  name="physicalProgress"
-                  className="kpi-input"
-                  placeholder="0-100"
-                  min="0"
-                  max="100"
-                  value={kpiInputs.physicalProgress}
-                  onChange={handleKpiInputChange}
-                />
-              </div>
-
-              <div className="kpi-input-group">
-                <label htmlFor="budgetVariance">Budget Variance Score</label>
-                <input
-                  type="number"
-                  id="budgetVariance"
-                  name="budgetVariance"
-                  className="kpi-input"
-                  placeholder="0-100"
-                  min="0"
-                  max="100"
-                  value={kpiInputs.budgetVariance}
-                  onChange={handleKpiInputChange}
-                />
-              </div>
-
-              <div className="kpi-input-group">
-                <label htmlFor="qcPassRate">QC Pass Rate</label>
-                <input
-                  type="number"
-                  id="qcPassRate"
-                  name="qcPassRate"
-                  className="kpi-input"
-                  placeholder="0-100"
-                  min="0"
-                  max="100"
-                  value={kpiInputs.qcPassRate}
-                  onChange={handleKpiInputChange}
-                />
-              </div>
-
-              <div className="kpi-input-group">
-                <label htmlFor="fieldEvidenceCompleteness">Field Evidence Completeness</label>
-                <input
-                  type="number"
-                  id="fieldEvidenceCompleteness"
-                  name="fieldEvidenceCompleteness"
-                  className="kpi-input"
-                  placeholder="0-100"
-                  min="0"
-                  max="100"
-                  value={kpiInputs.fieldEvidenceCompleteness}
-                  onChange={handleKpiInputChange}
-                />
-              </div>
-            </div>
-
-            <div className="kpi-submit-container">
-              <button 
-                className="kpi-submit-btn"
-                onClick={handleCalculateKPI}
-              >
-                Calculate KPI
-              </button>
-            </div>
+            )}
           </div>
         </section>
 
