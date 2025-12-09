@@ -1,4 +1,3 @@
-* {
 /* <<<<<<< HEAD */
 /* ============================================================================
    FIELD WORKER DASHBOARD STYLES
@@ -876,11 +875,10 @@ body {
   }
 }
 
-  .analytics-grid {
-    grid-template-columns: 1fr;
-  }
+.analytics-grid {
+  grid-template-columns: 1fr;
+}
 
-  .kpi-breakdown {
-    grid-template-columns: 1fr;
-  }
+.kpi-breakdown {
+  grid-template-columns: 1fr;
 }
