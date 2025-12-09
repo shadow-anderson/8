@@ -37,19 +37,19 @@ export default function FieldWorkerDashboard() {
 
   // Navigation items
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard'},
-    { id: 'productivity-strip', label: 'Productivity Strip'},
-    { id: 'dpr-workspace', label: 'DPR Workspace'},
-    { id: 'evidence-portal', label: 'Evidence Portal'},
-    { id: 'task-board', label: 'Task Board'},
-    { id: 'kpi-meter', label: 'KPI Meter'},
-    { id: 'project-timeline', label: 'Project Timeline'},
-    { id: 'comm-hub', label: 'Communication Hub'},
-    { id: 'notifications', label: 'Notifications'},
-    { id: 'ask-prabhav', label: 'AI Assistant'},
-    { id: 'compliance-validator', label: 'Compliance'},
-    { id: 'worker-analytics', label: 'Analytics'},
-    { id: 'accountability-log', label: 'Accountability'},
+    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+    { id: 'productivity-strip', label: 'Productivity Strip', icon: '📊' },
+    { id: 'dpr-workspace', label: 'DPR Workspace', icon: '📋' },
+    { id: 'evidence-portal', label: 'Evidence Portal', icon: '📸' },
+    { id: 'task-board', label: 'Task Board', icon: '📊' },
+    { id: 'kpi-meter', label: 'KPI Meter', icon: '📈' },
+    { id: 'project-timeline', label: 'Project Timeline', icon: '🗓️' },
+    { id: 'comm-hub', label: 'Communication Hub', icon: '💬' },
+    { id: 'notifications', label: 'Notifications', icon: '🔔' },
+    { id: 'ask-prabhav', label: 'AI Assistant', icon: '🤖' },
+    { id: 'compliance-validator', label: 'Compliance', icon: '✅' },
+    { id: 'worker-analytics', label: 'Analytics', icon: '📊' },
+    { id: 'accountability-log', label: 'Accountability', icon: '📜' },
   ];
 
   // Offline data sync function
@@ -72,6 +72,12 @@ export default function FieldWorkerDashboard() {
         return <KPIMeter />;
       case 'project-timeline':
         return <ProjectTimeline />;
+      case 'comm-hub':
+        return <CommHub />;
+      case 'notifications':
+        return <Notifications />;
+      case 'ask-prabhav':
+        return <AskPrabhav />;
       case 'compliance-validator':
         return <ComplianceValidator />;
       case 'worker-analytics':
@@ -85,7 +91,7 @@ export default function FieldWorkerDashboard() {
             <p>Select a section from the left sidebar to get started.</p>
             {!isOnline && (
               <div className="offline-banner">
-                 You are offline — data will sync automatically when connection returns
+                ⚠️ You are offline — data will sync automatically when connection returns
               </div>
             )}
           </div>
@@ -149,6 +155,7 @@ function Sidebar({ navItems, activeSection, setActiveSection, sidebarOpen, setSi
               setSidebarOpen(false);
             }}
           >
+            <span className="nav-icon">{item.icon}</span>
             <span className="nav-label">{item.label}</span>
           </button>
         ))}
@@ -185,7 +192,7 @@ function ProductivityStrip() {
 
   return (
     <section className="content-section productivity-strip cream-bg">
-      <h2>Productivity Strip</h2>
+      <h2>📊 Productivity Strip</h2>
       <div className="strip-container cream-strip">
         <div className="strip-item">
           <span className="strip-label">Due Today</span>
@@ -329,7 +336,7 @@ function DPRWorkspace({ isOnline }) {
 
   return (
     <section className="content-section dpr-workspace">
-      <h2>DPR Upload Workspace</h2>
+      <h2>📋 DPR Upload Workspace</h2>
       <div className="dpr-upload-area dpr-upload-area-enhanced">
         <div className="dpr-upload-header">
           <p><strong>Upload your Daily Progress Reports (DPR) here. Supported formats: PDF, Excel, PPT, Images, Videos.</strong></p>
@@ -545,7 +552,7 @@ function EvidencePortal({ isOnline }) {
 
   return (
     <section className="content-section evidence-portal">
-      <h2>Evidence Capture Portal</h2>
+      <h2>📸 Evidence Capture Portal</h2>
 
       <div className="evidence-upload">
         <input
@@ -630,40 +637,82 @@ function TaskBoard() {
 
   async function fetchTasks() {
     // TODO: API call
-    
+    const mockTasks = [
+      {
+        id: 'T-101',
+        title: 'Survey Zone A',
+        duration: '3 days',
+        deadline: '2025-12-10',
+        progress: 0,
+        status: 'pending',
+        priority: 'high',
+        dependencies: [],
+      },
+      {
+        id: 'T-102',
+        title: 'Soil Testing Site B',
+        duration: '5 days',
+        deadline: '2025-12-12',
+        progress: 60,
+        status: 'in-progress',
+        priority: 'medium',
+        dependencies: ['T-101'],
+      },
+      {
+        id: 'T-103',
+        title: 'DPR Submission Phase 1',
+        duration: '2 days',
+        deadline: '2025-12-09',
+        progress: 100,
+        status: 'completed',
+        priority: 'low',
+        dependencies: [],
+      },
+      {
+        id: 'T-100',
+        title: 'Initial Assessment',
+        duration: '2 days',
+        deadline: '2025-12-05',
+        progress: 100,
+        status: 'completed',
+        priority: 'low',
+        dependencies: [],
+      },
+    ];
+    setTasks(mockTasks);
   }
 
-  // function getStatusBadge(status) {
-  //   switch (status) {
-  //     case 'pending':
-  //       return <span className="hq-status-badge hq-badge-pending">Pending</span>;
-  //     case 'in-progress':
-  //       return <span className="hq-status-badge hq-badge-progress">In Progress</span>;
-  //     case 'completed':
-  //       return <span className="hq-status-badge hq-badge-completed">Completed</span>;
-  //     case 'under-review':
-  //       return <span className="hq-status-badge hq-badge-review">Under Review</span>;
-  //     case 'overdue':
-  //       return <span className="hq-status-badge hq-badge-overdue">Overdue</span>;
-  //     default:
-  //       return <span className="hq-status-badge">{status}</span>;
-  //   }
-  // }
+  function getStatusBadge(status) {
+    switch (status) {
+      case 'pending':
+        return <span className="hq-status-badge hq-badge-pending">Pending</span>;
+      case 'in-progress':
+        return <span className="hq-status-badge hq-badge-progress">In Progress</span>;
+      case 'completed':
+        return <span className="hq-status-badge hq-badge-completed">Completed</span>;
+      case 'under-review':
+        return <span className="hq-status-badge hq-badge-review">Under Review</span>;
+      case 'overdue':
+        return <span className="hq-status-badge hq-badge-overdue">Overdue</span>;
+      default:
+        return <span className="hq-status-badge">{status}</span>;
+    }
+  }
 
-  // function getPriorityBadge(priority) {
-  //   switch (priority) {
-  //     case 'high':
-  //       return <span className="hq-priority-badge hq-priority-high">High</span>;
-  //     case 'medium':
-  //       return <span className="hq-priority-badge hq-priority-medium">Medium</span>;
-  //     case 'low':
-  //       return <span className="hq-priority-badge hq-priority-low">Low</span>;
-  //     case 'critical':
-  //       return <span className="hq-priority-badge hq-priority-critical">Critical</span>;
-  //     default:
-  //       return <span className="hq-priority-badge">{priority}</span>;
-  //   }
-  // }
+  function getPriorityBadge(priority) {
+    switch (priority) {
+      case 'high':
+        return <span className="hq-priority-badge hq-priority-high">High</span>;
+      case 'medium':
+        return <span className="hq-priority-badge hq-priority-medium">Medium</span>;
+      case 'low':
+        return <span className="hq-priority-badge hq-priority-low">Low</span>;
+      case 'critical':
+        return <span className="hq-priority-badge hq-priority-critical">Critical</span>;
+      default:
+        return <span className="hq-priority-badge">{priority}</span>;
+    }
+  }
 
   function handleProgress(id, progress) {
     // TODO: API call
@@ -683,7 +732,7 @@ function TaskBoard() {
 
   return (
     <section className="content-section task-board">
-      <h2>Task Board</h2>
+      <h2>📊 Task Board</h2>
       <div className="hq-table-wrapper">
         <table className="hq-task-table">
           <thead>
@@ -762,7 +811,7 @@ function KPIMeter() {
 
   return (
     <section className="content-section kpi-meter">
-      <h2>Personal KPI Meter</h2>
+      <h2>📈 Personal KPI Meter</h2>
       <div className="kpi-score">
         <div className="score-circle">
           <span className="score">KPI Score: {kpi.score}</span>
@@ -838,17 +887,40 @@ function ProjectTimeline() {
 
   async function fetchProjects() {
     // TODO: API call
-    
+    const mockProjects = [
+      {
+        id: 'P-001',
+        name: 'Highway Expansion Project',
+        milestones: [
+          { name: 'Survey Complete', date: '2025-12-05', status: 'completed' },
+          { name: 'Soil Analysis', date: '2025-12-12', status: 'in-progress' },
+          { name: 'Foundation Work', date: '2025-12-20', status: 'pending' },
+        ],
+        assignedTasks: ['T-101', 'T-102'],
+        delayFlag: false,
+      },
+      {
+        id: 'P-002',
+        name: 'Bridge Construction',
+        milestones: [
+          { name: 'Site Preparation', date: '2025-11-30', status: 'completed' },
+          { name: 'Pillar Installation', date: '2025-12-15', status: 'delayed' },
+        ],
+        assignedTasks: ['T-103'],
+        delayFlag: true,
+      },
+    ];
+    setProjects(mockProjects);
   }
 
   return (
     <section className="content-section project-timeline">
-      <h2>Project Timeline</h2>
+      <h2>🗓️ Project Timeline</h2>
       <div className="project-list">
         {projects.map((project) => (
           <div key={project.id} className="project-item project-item-spacious">
             <h3>
-              {project.name} {project.delayFlag && <span className="delay-flag">Delayed</span>}
+              {project.name} {project.delayFlag && <span className="delay-flag">🚨 Delayed</span>}
             </h3>
             <div className="project-details">
               <p><strong>Project ID:</strong> {project.id}</p>
@@ -874,6 +946,48 @@ function ProjectTimeline() {
     </section>
   );
 }
+
+// ============================================================================
+// 7. COMMUNICATION & CLARIFICATION HUB
+// ============================================================================
+function CommHub() {
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+
+  useEffect(() => {
+    fetchMessages();
+  }, []);
+
+  async function fetchMessages() {
+    // TODO: API call
+    const mockMessages = [
+      { id: 1, sender: 'Manager A', text: 'Please clarify the survey coordinates for Zone B', timestamp: '10:30 AM' },
+      { id: 2, sender: 'You', text: 'Coordinates are 28.6139, 77.2090', timestamp: '10:45 AM' },
+      { id: 3, sender: 'HQ Support', text: 'AI suggestion: Attach geo-tagged photo', timestamp: '11:00 AM', isAI: true },
+    ];
+    setMessages(mockMessages);
+  }
+
+  async function sendMessage() {
+    // TODO: API call
+    if (!newMessage.trim()) return;
+    
+  }
+
+  return (
+    <section className="content-section comm-hub">
+      <h2>💬 Communication & Clarification Hub</h2>
+      <div className="message-thread">
+        {messages.map((msg) => (
+          <div key={msg.id} className={`message ${msg.sender === 'You' ? 'own' : 'other'} ${msg.isAI ? 'ai' : ''}`}>
+            <strong>{msg.sender}</strong> <span className="timestamp">{msg.timestamp}</span>
+            <p>{msg.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 // ============================================================================
 // 8. NOTIFICATIONS CENTER
 // ============================================================================
@@ -891,7 +1005,7 @@ function Notifications() {
 
   return (
     <section className="content-section notifications-center">
-      <h2>Notifications</h2>
+      <h2>🔔 Notifications</h2>
       <div className="notification-list">
         {notifications.length === 0 ? (
           <p>No notifications</p>
@@ -903,6 +1017,193 @@ function Notifications() {
             </div>
           ))
         )}
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// 9. AI ASSISTANT ("Ask Prabhav")
+// ============================================================================
+function AskPrabhav() {
+  const [prompt, setPrompt] = useState('');
+  const [response, setResponse] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function queryPrabhav(userPrompt) {
+    // TODO: API call
+    setIsLoading(true);
+    console.log('Querying Prabhav AI:', userPrompt);
+    
+    // Mock response
+    setTimeout(() => {
+      let mockResponse = '';
+      if (userPrompt.toLowerCase().includes('draft dpr')) {
+        mockResponse = 'Generated DPR Draft:\n\n1. Introduction\n2. Survey Details\n3. Findings\n4. Recommendations';
+      } else if (userPrompt.toLowerCase().includes('summarize tasks')) {
+        mockResponse = 'You have 5 tasks due today, 2 overdue. Focus on T-102 (60% complete, deadline in 2 days).';
+      } else if (userPrompt.toLowerCase().includes('weak kpi')) {
+        mockResponse = 'Your compliance score (84) is below target. Consider reviewing submission guidelines.';
+      } else {
+        mockResponse = 'I can help with:\n- Generate draft DPR\n- Summarize tasks\n- Identify weak KPIs\n- Provide compliance tips';
+      }
+      setResponse(mockResponse);
+      setIsLoading(false);
+    }, 1500);
+  }
+
+  function handleAsk() {
+    if (!prompt.trim()) return;
+    queryPrabhav(prompt);
+  }
+
+  return (
+    <section className="content-section ask-prabhav">
+      <h2>🤖 Ask Prabhav (AI Assistant)</h2>
+      <div className="ai-interface">
+        <input
+          type="text"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Ask anything: 'Generate draft DPR', 'Summarize my tasks'..."
+          onKeyPress={(e) => e.key === 'Enter' && handleAsk()}
+        />
+        <button onClick={handleAsk} disabled={isLoading}>
+          {isLoading ? 'Thinking...' : 'Ask'}
+        </button>
+      </div>
+      {response && (
+        <div className="ai-response">
+          <h3>Response:</h3>
+          <pre>{response}</pre>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ============================================================================
+// 10. COMPLIANCE VALIDATOR
+// ============================================================================
+function ComplianceValidator() {
+  const [validationResults, setValidationResults] = useState(null);
+
+  function validateDPR() {
+    // Mock validation logic
+    const issues = [];
+    
+    // Simulated checks
+    if (Math.random() > 0.7) issues.push('Missing page 3 - Survey details');
+    if (Math.random() > 0.8) issues.push('Incorrect file naming convention');
+    if (Math.random() > 0.6) issues.push('Date mismatch: Document date vs submission date');
+    if (Math.random() > 0.9) issues.push('Survey coordinates inconsistent with GPS metadata');
+
+    setValidationResults({
+      passed: issues.length === 0,
+      issues: issues,
+      suggestions: issues.length > 0 ? ['Review document completeness', 'Check naming: DPR_YYYY-MM-DD_ProjectID.pdf', 'Verify all dates match'] : [],
+    });
+  }
+
+  return (
+    <section className="content-section compliance-validator">
+      <h2>✅ Compliance Validator</h2>
+      <button onClick={validateDPR} className="validate-btn">
+        Run Compliance Check
+      </button>
+
+      {validationResults && (
+        <div className={`validation-results ${validationResults.passed ? 'pass' : 'fail'}`}>
+          <h3>{validationResults.passed ? '✓ All checks passed!' : '⚠️ Issues found:'}</h3>
+          {!validationResults.passed && (
+            <>
+              <ul className="issue-list">
+                {validationResults.issues.map((issue, idx) => (
+                  <li key={idx}>{issue}</li>
+                ))}
+              </ul>
+              <h4>Suggestions:</h4>
+              <ul className="suggestion-list">
+                {validationResults.suggestions.map((suggestion, idx) => (
+                  <li key={idx}>{suggestion}</li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ============================================================================
+// 11. WORKER ANALYTICS DASHBOARD
+// ============================================================================
+function WorkerAnalytics() {
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
+
+  async function fetchAnalytics() {
+    // TODO: API call
+    const mockAnalytics = {
+      weeklyProgress: [65, 70, 75, 80, 85, 87, 90],
+      dprRejectionRate: 12,
+      avgSubmissionDelay: 1.5,
+      delayCauses: {
+        weather: 40,
+        mismatch: 25,
+        dependencies: 20,
+        other: 15,
+      },
+    };
+    setAnalytics(mockAnalytics);
+  }
+
+  if (!analytics) return <div className="worker-analytics">Loading analytics...</div>;
+
+  return (
+    <section className="content-section worker-analytics">
+      <h2>📊 Worker Analytics Dashboard</h2>
+
+      <div className="analytics-grid">
+        <div className="analytics-card">
+          <h3>Weekly Progress</h3>
+          <svg width="100%" height="150" viewBox="0 0 350 150">
+            {analytics.weeklyProgress.map((value, idx) => (
+              <rect
+                key={idx}
+                x={10 + idx * 50}
+                y={150 - value}
+                width="40"
+                height={value}
+                fill="#4CAF50"
+              />
+            ))}
+          </svg>
+        </div>
+
+        <div className="analytics-card">
+          <h3>DPR Rejection Rate</h3>
+          <div className="stat-value">{analytics.dprRejectionRate}%</div>
+        </div>
+
+        <div className="analytics-card">
+          <h3>Avg Submission Delay</h3>
+          <div className="stat-value">{analytics.avgSubmissionDelay} days</div>
+        </div>
+
+        <div className="analytics-card">
+          <h3>Delay Causes Breakdown</h3>
+          <ul className="cause-list">
+            <li>Weather: {analytics.delayCauses.weather}%</li>
+            <li>Mismatch: {analytics.delayCauses.mismatch}%</li>
+            <li>Dependencies: {analytics.delayCauses.dependencies}%</li>
+            <li>Other: {analytics.delayCauses.other}%</li>
+          </ul>
+        </div>
       </div>
     </section>
   );
@@ -925,7 +1226,7 @@ function AccountabilityLog() {
 
   return (
     <section className="content-section accountability-log">
-      <h2>Accountability Log</h2>
+      <h2>📜 Accountability Log</h2>
       <table className="log-table">
         <thead>
           <tr>
