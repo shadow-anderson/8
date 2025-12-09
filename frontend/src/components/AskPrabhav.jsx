@@ -200,8 +200,3 @@ Team context:
 - Team role: ${team.role || "N/A"}
 ` : ""}
 `;
-<<<<<<< HEAD
-}
-=======
-}
->>>>>>> 16e823d (Added some basic constraints to AskPrabhav)
