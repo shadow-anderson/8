@@ -6,10 +6,12 @@ import AdminDashboard from './pages/AdminDashboard';
 import ManagerDashboard from './pages/ManagerDashboard';
 import FieldWorkerDashboard from './pages/FieldWorkerDashboard';
 import HQWorkerDashboard from './pages/HQWorkerDashboard';
+import AskPrabhav from './components/AskPrabhav';
 import './App.css';
 
 function App() {
   return (
+    <>
     <AuthProvider>
       <Router>
         <Routes>
@@ -55,6 +57,9 @@ function App() {
         </Routes>
       </Router>
     </AuthProvider>
+
+    <AskPrabhav />
+    </>
   );
 }
 
