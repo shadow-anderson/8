@@ -173,7 +173,6 @@ body {
   box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
 }
 
-<<<<<<< HEAD
 .form-dropdown-group {
   display: flex;
   justify-content: space-between;
@@ -214,8 +213,6 @@ body {
   color: #2d2420;
 }
 
-=======
->>>>>>> 2d0ebb9 (Fixed FieldWorkerDashboard syntax error)
 /* Updated submit button to purple */
 .btn-submit {
   padding: 12px 24px;
